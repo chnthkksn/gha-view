@@ -215,6 +215,19 @@ export default function DashboardPage() {
           <RepoList repositories={repositories} isLoading={reposLoading} />
           <WorkflowRuns runs={workflowRuns} isLoading={runsLoading} />
         </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center pb-8 border-t pt-8 border-border/40">
+          <a
+            href="https://github.com/chnthkksn/gha-view"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Github className="h-4 w-4" />
+            <span>Star on GitHub</span>
+          </a>
+        </div>
       </main>
     </div>
   );
