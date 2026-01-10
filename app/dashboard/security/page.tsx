@@ -39,6 +39,7 @@ import { UAParser } from "ua-parser-js";
 
 interface SessionData {
   id: string;
+  token: string;
   userAgent?: string | null;
   ipAddress?: string | null;
   expiresAt: Date;
@@ -326,7 +327,7 @@ export default function SecurityPage() {
                           description="The selected device will be logged out immediately."
                           confirmLabel="Revoke"
                           variant="destructive"
-                          onConfirm={() => handleRevokeSession(s.id)}
+                          onConfirm={() => handleRevokeSession(s.token)}
                         />
                       )}
                     </div>
