@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GHA View",
-  description: "Monitor your GitHub Actions workflows in real-time",
+  description:
+    "Monitor your GitHub Actions workflows with auto-refreshing updates",
 };
 
 export default function RootLayout({

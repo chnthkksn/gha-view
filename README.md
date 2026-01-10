@@ -1,6 +1,6 @@
 # GHA View 🚀
 
-A beautiful, real-time monitoring dashboard for GitHub Actions workflows.
+A beautiful, auto-refreshing monitoring dashboard for GitHub Actions workflows.
 
 > **Why this exists**: We built this because viewing GitHub Actions across multiple repositories is surprisingly difficult and time-consuming in the default GitHub interface. This dashboard solves that by giving you a unified, auto-refreshing view of everything that's happening in your CI/CD pipelines.
 
@@ -13,7 +13,7 @@ A beautiful, real-time monitoring dashboard for GitHub Actions workflows.
 ## ✨ Features
 
 - 🔐 **Secure Authentication** - GitHub OAuth + Passkey support with named devices
-- 📊 **Real-time Dashboard** - Auto-refreshing workflow status (default: 60s)
+- 📊 **Live Dashboard** - Auto-refreshing workflow status (default: 60s)
 - 🔍 **Smart Search** - Filter runs by repo, branch, user, or commit message
 - ⚡ **Rate Limit Aware** - Smart tracking of your GitHub API usage to prevent lockouts
 - 📈 **Instant Analytics** - Success rates, failure tracking, and run duration metrics
@@ -119,7 +119,7 @@ lib/
 
 ### ⚠️ API Rate Limits
 
-This dashboard hits the GitHub API frequently to provide real-time updates.
+This dashboard hits the GitHub API frequently to provide auto-refreshing updates.
 
 - **Authenticated limit**: 5,000 requests per hour.
 - **Monitoring**: Check the "API Usage" card in the dashboard header to see your remaining quota.

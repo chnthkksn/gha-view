@@ -96,7 +96,7 @@ export default function DashboardPage() {
                 GHA View
               </h1>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <p>Real-time workflow monitoring</p>
+                <p>Live workflow monitoring</p>
                 {lastUpdated > 0 && (
                   <>
                     <span>•</span>
