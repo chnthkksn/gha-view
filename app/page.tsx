@@ -26,31 +26,22 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
-      </div>
-
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 relative overflow-hidden">
       <main className="relative z-10 flex flex-col items-center justify-center px-6 py-16 text-center max-w-5xl">
         {/* Logo/Icon */}
-        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-purple-600/20 to-blue-600/20 backdrop-blur-sm border border-purple-500/20">
-          <Github className="h-16 w-16 text-white" />
+        <div className="mb-8 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <Github className="h-12 w-12 text-white" />
         </div>
 
         {/* Hero text */}
-        <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 tracking-tight">
-          GitHub Actions
-          <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mt-2">
-            Monitor
-          </span>
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+          GHA View
         </h1>
 
-        <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl leading-relaxed">
-          Monitor all your repositories and workflow runs in one beautiful
-          dashboard. Real-time updates, comprehensive insights, stunning design.
+        <p className="text-xl text-slate-400 mb-12 max-w-2xl leading-relaxed">
+          Exploring individual repositories to check status is a waste of time.
+          <br />
+          Get a single, auto-refreshing view of your entire CI/CD pipeline.
         </p>
 
         {/* CTA */}
@@ -58,10 +49,10 @@ export default function Home() {
           <GitHubLoginButton />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-white/10" />
+              <span className="w-full border-t border-slate-800" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-slate-950 px-2 text-gray-500">
+              <span className="bg-slate-950 px-2 text-slate-600">
                 Or sign in with
               </span>
             </div>
@@ -70,71 +61,58 @@ export default function Home() {
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl">
-          <div className="p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 group">
-            <div className="mb-4 p-3 rounded-lg bg-purple-500/20 w-fit">
-              <Activity className="h-6 w-6 text-purple-400" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+            <div className="mb-4 text-purple-400">
+              <Activity className="h-6 w-6 mx-auto" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">
-              Real-time Monitoring
+              Unified View
             </h3>
-            <p className="text-gray-400 text-sm">
-              Watch your workflows run in real-time with automatic updates every
-              10 seconds
+            <p className="text-slate-500 text-sm">
+              Stop checking 20 different repos. See every running workflow in
+              one list.
             </p>
           </div>
 
-          <div className="p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 group">
-            <div className="mb-4 p-3 rounded-lg bg-blue-500/20 w-fit">
-              <Zap className="h-6 w-6 text-blue-400" />
+          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+            <div className="mb-4 text-blue-400">
+              <Zap className="h-6 w-6 mx-auto" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">
-              Instant Insights
+              Auto-Refresh
             </h3>
-            <p className="text-gray-400 text-sm">
-              Get immediate visibility into all repositories with GitHub Actions
-              enabled
+            <p className="text-slate-500 text-sm">
+              Dashboard automatically updates so you can keep it on a second
+              monitor.
             </p>
           </div>
 
-          <div className="p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 group">
-            <div className="mb-4 p-3 rounded-lg bg-pink-500/20 w-fit">
-              <BarChart3 className="h-6 w-6 text-pink-400" />
+          <div className="p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+            <div className="mb-4 text-pink-400">
+              <BarChart3 className="h-6 w-6 mx-auto" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              Success Analytics
-            </h3>
-            <p className="text-gray-400 text-sm">
-              Track success rates, failure patterns, and workflow performance
-              metrics
+            <h3 className="text-lg font-semibold text-white mb-2">Focus</h3>
+            <p className="text-slate-500 text-sm">
+              Filter by user, branch, or status to find exactly what broke (and
+              who broke it).
             </p>
           </div>
         </div>
-      </main>
 
-      <style jsx>{`
-        @keyframes blob {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
+        {/* Footer */}
+        <div className="mt-16 text-center">
+          <a
+            href="https://github.com/chnthkksn/gha-view"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-white transition-colors"
+          >
+            <Github className="h-4 w-4" />
+            <span>Star on GitHub</span>
+          </a>
+        </div>
+      </main>
     </div>
   );
 }
