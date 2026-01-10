@@ -109,10 +109,13 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
               filteredRuns.map((run) => {
                 const statusColor = getStatusColor(run.status, run.conclusion);
                 const statusText = getStatusText(run.status, run.conclusion);
-                const duration = calculateDuration(
+                let duration = calculateDuration(
                   run.run_started_at,
                   run.status === "completed" ? run.updated_at : undefined
                 );
+
+                if (duration > 86400) duration = 86400; // Cap at 24h
+                if (duration < 0) duration = 0; // Sanity check
 
                 const commitUrl = `https://github.com/${run.repository.full_name}/commit/${run.head_sha}`;
 

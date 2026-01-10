@@ -141,16 +141,31 @@ export function calculateWorkflowStats(
     completedRuns.length > 0 ? (failedRuns / completedRuns.length) * 100 : 0;
 
   // Calculate Average Duration
-  const totalDuration = completedRuns.reduce((acc, run) => {
+  // Filter for runs in the last 30 days to prevent ancient runs from skewing stats
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const recentCompletedRuns = completedRuns.filter(
+    (run) => new Date(run.created_at) > thirtyDaysAgo
+  );
+
+  const totalDuration = recentCompletedRuns.reduce((acc, run) => {
     // Only calculate if we have both start and update times, and run_started_at is usually more accurate if available
     const start = run.run_started_at || run.created_at;
     const end = run.updated_at; // Use updated_at as proxy for completion time
-    return acc + calculateDuration(start, end);
+
+    let duration = calculateDuration(start, end);
+
+    // Sanity check: If duration is > 24 hours (86400s), it's likely a bug or stale run. Cap it or ignore.
+    // Also ignore negative durations.
+    if (duration < 0) return acc;
+    if (duration > 86400) duration = 86400; // Cap at 24 hours
+
+    return acc + duration;
   }, 0);
 
   const avgDuration =
-    completedRuns.length > 0
-      ? Math.round(totalDuration / completedRuns.length)
+    recentCompletedRuns.length > 0
+      ? Math.round(totalDuration / recentCompletedRuns.length)
       : 0;
 
   // Calculate Active Runs (Last 24h)
