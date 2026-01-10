@@ -8,6 +8,8 @@ A beautiful, real-time monitoring dashboard for GitHub Actions workflows.
 ![Better Auth](https://img.shields.io/badge/Better_Auth-OAuth-purple?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 
+![GHA View Dashboard](public/dashboard-preview.png)
+
 ## ✨ Features
 
 - 🔐 **Secure Authentication** - GitHub OAuth + Passkey support with named devices

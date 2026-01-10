@@ -27,14 +27,14 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 relative overflow-hidden">
-      <main className="relative z-10 flex flex-col items-center justify-center px-6 py-16 text-center max-w-5xl">
+      <main className="relative z-10 flex flex-col items-center justify-center px-4 md:px-6 py-12 md:py-24 text-center max-w-5xl w-full">
         {/* Logo/Icon */}
-        <div className="mb-8 p-4 rounded-2xl bg-slate-900 border border-slate-800">
-          <Github className="h-12 w-12 text-white" />
+        <div className="mb-6 md:mb-8 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+          <Github className="h-10 w-10 md:h-12 md:w-12 text-white" />
         </div>
 
         {/* Hero text */}
-        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 md:mb-6 tracking-tight">
           GHA View
         </h1>
 
@@ -43,6 +43,18 @@ export default function Home() {
           <br />
           Get a single, auto-refreshing view of your entire CI/CD pipeline.
         </p>
+
+        {/* Dashboard Preview */}
+        <div className="mb-16 relative w-full max-w-4xl">
+          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur opacity-25"></div>
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+            <img
+              src="/dashboard-preview.png"
+              alt="GHA View Dashboard"
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
 
         {/* CTA */}
         <div className="mb-16 flex flex-col gap-4 w-full max-w-sm">
