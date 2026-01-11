@@ -20,8 +20,20 @@ export default function Home() {
 
   if (isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
-        <div className="animate-pulse text-white text-xl">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 1, 0.5],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <Github className="h-12 w-12 text-white" />
+        </motion.div>
       </div>
     );
   }
