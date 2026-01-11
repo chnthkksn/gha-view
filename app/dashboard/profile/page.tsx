@@ -62,7 +62,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-6 py-8">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 pb-20 md:pb-8">
       <Button
         variant="ghost"
         size="sm"
@@ -73,16 +73,19 @@ export default function ProfilePage() {
         Back to Dashboard
       </Button>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Profile
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your account settings and preferences.
           </p>
         </div>
         <Button
           onClick={() => setIsEditing(!isEditing)}
           variant={isEditing ? "ghost" : "default"}
+          className="w-full sm:w-auto"
         >
           {isEditing ? "Cancel" : "Edit Profile"}
         </Button>
@@ -140,16 +143,21 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-2">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsEditing(false)}
                     disabled={isLoading}
+                    className="w-full sm:w-auto"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full sm:w-auto"
+                  >
                     {isLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
@@ -166,48 +174,56 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-6">
-                  <Avatar className="h-24 w-24">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+                  <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
                     <AvatarImage src={user.image || undefined} />
-                    <AvatarFallback className="text-2xl">
+                    <AvatarFallback className="text-xl sm:text-2xl">
                       {user.name?.[0] || "U"}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="space-y-1">
-                    <h3 className="text-2xl font-bold">{user.name}</h3>
-                    <p className="text-muted-foreground">{user.email}</p>
+                  <div className="space-y-1 text-center sm:text-left">
+                    <h3 className="text-xl sm:text-2xl font-bold">
+                      {user.name}
+                    </h3>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="p-4 rounded-lg border bg-card">
-                    <div className="flex items-center gap-3 text-muted-foreground mb-1">
+                <div className="grid gap-3 sm:gap-4">
+                  <div className="p-3 sm:p-4 rounded-lg border bg-card">
+                    <div className="flex items-center gap-3 text-muted-foreground mb-1.5">
                       <User className="h-4 w-4" />
                       <span className="text-xs font-medium uppercase tracking-wider">
                         Display Name
                       </span>
                     </div>
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium text-sm sm:text-base">
+                      {user.name}
+                    </div>
                   </div>
 
-                  <div className="p-4 rounded-lg border bg-card">
-                    <div className="flex items-center gap-3 text-muted-foreground mb-1">
+                  <div className="p-3 sm:p-4 rounded-lg border bg-card">
+                    <div className="flex items-center gap-3 text-muted-foreground mb-1.5">
                       <Mail className="h-4 w-4" />
                       <span className="text-xs font-medium uppercase tracking-wider">
                         Email Address
                       </span>
                     </div>
-                    <div className="font-medium">{user.email}</div>
+                    <div className="font-medium text-sm sm:text-base break-all">
+                      {user.email}
+                    </div>
                   </div>
 
-                  <div className="p-4 rounded-lg border bg-card">
-                    <div className="flex items-center gap-3 text-muted-foreground mb-1">
+                  <div className="p-3 sm:p-4 rounded-lg border bg-card">
+                    <div className="flex items-center gap-3 text-muted-foreground mb-1.5">
                       <Calendar className="h-4 w-4" />
                       <span className="text-xs font-medium uppercase tracking-wider">
                         Member Since
                       </span>
                     </div>
-                    <div className="font-medium">
+                    <div className="font-medium text-sm sm:text-base">
                       {user.createdAt
                         ? new Date(user.createdAt).toLocaleDateString()
                         : new Date().toLocaleDateString()}

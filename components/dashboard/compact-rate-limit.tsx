@@ -39,7 +39,7 @@ export function CompactRateLimit() {
     <HoverCard>
       <HoverCardTrigger asChild>
         <div
-          className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-help ${colorClass}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-help ${colorClass}`}
         >
           <Icon className="h-3.5 w-3.5" />
           <span>Rate limit: {percentageUsed.toFixed(0)}%</span>

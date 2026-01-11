@@ -151,27 +151,29 @@ export default function SecurityPage() {
   if (!session?.user) return null;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-6 py-8">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 pb-20 md:pb-8">
       <Button
         variant="ghost"
         size="sm"
         onClick={() => router.push("/dashboard")}
-        className="gap-2 -ml-2 mb-4 text-muted-foreground hover:text-foreground"
+        className="gap-2 -ml-2 mb-2 sm:mb-4 text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
       </Button>
 
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Security</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          Security
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Manage your account security, sessions, and authentication methods.
         </p>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         {/* Connected Accounts & Passkeys */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -217,11 +219,11 @@ export default function SecurityPage() {
                   {passkeys.map((pk) => (
                     <div
                       key={pk.id}
-                      className="flex items-center justify-between p-3 rounded-lg border bg-card"
+                      className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg border bg-card"
                     >
-                      <div className="flex items-center gap-3">
-                        <Key className="h-5 w-5" />
-                        <div className="font-medium text-sm">
+                      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <Key className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+                        <div className="font-medium text-sm truncate">
                           {pk.name || "WebAuthn Key"}
                         </div>
                       </div>
@@ -230,7 +232,7 @@ export default function SecurityPage() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8 text-red-500"
+                            className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 shrink-0"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -285,29 +287,42 @@ export default function SecurityPage() {
                   return (
                     <div
                       key={s.id}
-                      className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                      className="flex flex-col gap-3 p-3 sm:p-4 rounded-lg border bg-card"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-muted rounded-full">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="p-2 bg-muted rounded-full shrink-0">
                           {getDeviceIcon(s.userAgent || "")}
                         </div>
-                        <div>
-                          <div className="font-medium flex items-center gap-2">
-                            {info.title}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <span className="text-sm sm:text-base font-medium">
+                              {info.title}
+                            </span>
                             {s.id === session.session.id && (
-                              <Badge className="bg-green-600 hover:bg-green-700">
+                              <Badge className="bg-green-600 hover:bg-green-700 text-xs">
                                 Current
                               </Badge>
                             )}
                           </div>
-                          <div className="text-xs text-muted-foreground flex items-center gap-2">
-                            <Globe className="h-3 w-3" />
-                            {s.ipAddress || "Unknown IP"}
-                            <span className="text-muted-foreground/50">•</span>
-                            {info.subtitle}
-                            <span className="text-muted-foreground/50">•</span>
-                            Expires:{" "}
-                            {new Date(s.expiresAt).toLocaleDateString()}
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <div className="flex items-center gap-1.5">
+                              <Globe className="h-3 w-3 shrink-0" />
+                              <span className="truncate">
+                                {s.ipAddress || "Unknown IP"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="hidden sm:inline">
+                                {info.subtitle}
+                              </span>
+                              {info.subtitle && (
+                                <span className="hidden sm:inline">•</span>
+                              )}
+                              <span>
+                                Expires:{" "}
+                                {new Date(s.expiresAt).toLocaleDateString()}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -317,10 +332,10 @@ export default function SecurityPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="text-red-500"
+                              className="text-red-500 w-full sm:w-auto justify-center"
                             >
                               <LogOut className="h-4 w-4 mr-2" />
-                              Revoke
+                              Revoke Session
                             </Button>
                           }
                           title="Revoke Session?"
@@ -342,22 +357,32 @@ export default function SecurityPage() {
         <Card className="border-red-200 dark:border-red-900/50">
           <CardHeader>
             <div className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
-              <CardTitle>Danger Zone</CardTitle>
+              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
+              <CardTitle className="text-base sm:text-lg">
+                Danger Zone
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/50">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/50 gap-3 sm:gap-4">
               <div className="space-y-1">
-                <div className="font-medium text-red-900 dark:text-red-200">
+                <div className="font-medium text-sm sm:text-base text-red-900 dark:text-red-200">
                   Delete Account
                 </div>
-                <div className="text-sm text-red-700 dark:text-red-300">
+                <div className="text-xs sm:text-sm text-red-700 dark:text-red-300">
                   Permanently remove your account and all data.
                 </div>
               </div>
               <ConfirmationDialog
-                trigger={<Button variant="destructive">Delete Account</Button>}
+                trigger={
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                  >
+                    Delete Account
+                  </Button>
+                }
                 title="Delete Your Account?"
                 description="This action is permanent and cannot be undone. All your data will be wiped immediately."
                 confirmLabel="Delete Account"
