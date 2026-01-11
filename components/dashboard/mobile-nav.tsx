@@ -37,21 +37,9 @@ export function MobileNav() {
 
   const handleWorkflows = () => {
     if (pathname !== "/dashboard") {
-      router.push("/dashboard");
-      // Wait for navigation then scroll
-      setTimeout(() => {
-        const workflowElement = document.querySelector(
-          "[data-workflow-section]"
-        );
-        if (workflowElement) {
-          workflowElement.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, 100);
+      router.push("/dashboard?scrollTo=workflows");
     } else {
-      const workflowElement = document.querySelector("[data-workflow-section]");
+      const workflowElement = document.getElementById("workflow-runs-mobile");
       if (workflowElement) {
         workflowElement.scrollIntoView({ behavior: "smooth", block: "start" });
       }

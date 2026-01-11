@@ -78,6 +78,26 @@ export default function DashboardPage() {
     }
   }, [session, isPending, router]);
 
+  // Handle scroll-to query parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const scrollTo = params.get("scrollTo");
+
+    if (scrollTo === "workflows") {
+      // Small delay to ensure content is rendered
+      const timer = setTimeout(() => {
+        const element = document.getElementById("workflow-runs-mobile");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+          // Clean up URL without reloading
+          window.history.replaceState({}, "", "/dashboard");
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   if (isPending || !session?.user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">

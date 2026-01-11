@@ -276,7 +276,10 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
       </Card>
 
       {/* Mobile Version */}
-      <div className="md:hidden flex flex-col h-full">
+      <div
+        id="workflow-runs-mobile"
+        className="md:hidden flex flex-col h-full scroll-mt-10"
+      >
         <div className="px-4 py-3 border-b space-y-3">
           <div>
             <h2 className="text-lg font-bold">Workflow Runs</h2>
