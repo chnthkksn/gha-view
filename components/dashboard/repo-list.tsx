@@ -18,6 +18,12 @@ import {
 } from "lucide-react";
 import type { GitHubRepository } from "@/types/github";
 import { formatRelativeTime } from "@/lib/utils/github-helpers";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 interface RepoListProps {
   repositories: GitHubRepository[];
@@ -162,67 +168,72 @@ export function RepoList({ repositories, isLoading }: RepoListProps) {
       </Card>
 
       {/* Mobile Version */}
-      <div className="md:hidden flex flex-col h-full">
-        <div className="px-4 py-3 border-b">
-          <h2 className="text-lg font-bold">Repositories</h2>
-          <p className="text-xs text-muted-foreground">
-            {repositories.length}{" "}
-            {repositories.length === 1 ? "repository" : "repositories"} with
-            Actions
-          </p>
-        </div>
+      <Collapsible defaultOpen className="md:hidden flex flex-col h-full">
+        <CollapsibleTrigger className="px-4 py-3 border-b flex items-center justify-between w-full group">
+          <div className="text-left">
+            <h2 className="text-lg font-bold">Repositories</h2>
+            <p className="text-xs text-muted-foreground">
+              {repositories.length}{" "}
+              {repositories.length === 1 ? "repository" : "repositories"} with
+              Actions
+            </p>
+          </div>
+          <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+        </CollapsibleTrigger>
 
-        <ScrollArea className="flex-1">
-          <div className="px-4 py-3 space-y-3">
-            {repositories.map((repo) => (
-              <a
-                key={repo.id}
-                href={repo.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block bg-card rounded-lg border p-3 active:bg-accent/50 transition-colors space-y-2"
-              >
-                <div className="flex items-start gap-2">
-                  <div className="shrink-0 mt-0.5">
-                    {repo.owner.type === "Organization" ? (
-                      <Building className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2">
-                      <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">
-                        {repo.full_name}
-                      </h3>
-                      {repo.private && (
-                        <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+        <CollapsibleContent className="flex-1 min-h-0">
+          <ScrollArea className="h-full">
+            <div className="px-4 py-3 space-y-3">
+              {repositories.map((repo) => (
+                <a
+                  key={repo.id}
+                  href={repo.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-card rounded-lg border p-3 active:bg-accent/50 transition-colors space-y-2"
+                >
+                  <div className="flex items-start gap-2">
+                    <div className="shrink-0 mt-0.5">
+                      {repo.owner.type === "Organization" ? (
+                        <Building className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <User className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 text-xs text-muted-foreground pl-6 flex-wrap">
-                  {repo.language && (
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                      <span>{repo.language}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2">
+                        <h3 className="font-semibold text-sm leading-tight line-clamp-2 flex-1">
+                          {repo.full_name}
+                        </h3>
+                        {repo.private && (
+                          <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3" />
-                    <span>{repo.stargazers_count}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <GitBranch className="h-3 w-3" />
-                    <span>{formatRelativeTime(repo.updated_at)}</span>
+
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground pl-6 flex-wrap">
+                    {repo.language && (
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                        <span>{repo.language}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3" />
+                      <span>{repo.stargazers_count}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <GitBranch className="h-3 w-3" />
+                      <span>{formatRelativeTime(repo.updated_at)}</span>
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+                </a>
+              ))}
+            </div>
+          </ScrollArea>
+        </CollapsibleContent>
+      </Collapsible>
     </>
   );
 }

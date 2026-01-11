@@ -16,6 +16,7 @@ import {
   Clock,
   GitBranch,
   Search,
+  ChevronDown,
 } from "lucide-react";
 import type { GitHubWorkflowRun } from "@/types/github";
 import {
@@ -28,6 +29,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface WorkflowRunsProps {
   runs: GitHubWorkflowRun[];
@@ -276,131 +282,164 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
       </Card>
 
       {/* Mobile Version */}
-      <div
+      <Collapsible
+        defaultOpen
         id="workflow-runs-mobile"
         className="md:hidden flex flex-col h-full scroll-mt-10"
       >
-        <div className="px-4 py-3 border-b space-y-3">
-          <div>
+        <CollapsibleTrigger className="px-4 py-3 border-b flex items-center justify-between w-full group">
+          <div className="text-left">
             <h2 className="text-lg font-bold">Workflow Runs</h2>
             <p className="text-xs text-muted-foreground">
               {runs.length} recent {runs.length === 1 ? "run" : "runs"}
             </p>
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search runs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9"
-            />
+          <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="flex-1 min-h-0">
+          <div className="px-4 py-3 border-b">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search runs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
           </div>
-        </div>
 
-        <ScrollArea className="flex-1">
-          <div className="px-4 py-3 space-y-3">
-            {filteredRuns.length === 0 ? (
-              <div className="text-center py-8 text-sm text-muted-foreground">
-                No runs match your search
-              </div>
-            ) : (
-              filteredRuns.map((run) => {
-                const statusColor = getStatusColor(run.status, run.conclusion);
-                const statusText = getStatusText(run.status, run.conclusion);
-                let duration = calculateDuration(
-                  run.run_started_at,
-                  run.status === "completed" ? run.updated_at : undefined
-                );
+          <ScrollArea className="flex-1">
+            <div className="px-4 py-3 space-y-3">
+              {filteredRuns.length === 0 ? (
+                <div className="text-center py-8 text-sm text-muted-foreground">
+                  No runs match your search
+                </div>
+              ) : (
+                filteredRuns.map((run) => {
+                  const statusColor = getStatusColor(
+                    run.status,
+                    run.conclusion
+                  );
+                  const statusText = getStatusText(run.status, run.conclusion);
+                  let duration = calculateDuration(
+                    run.run_started_at,
+                    run.status === "completed" ? run.updated_at : undefined
+                  );
 
-                if (duration > 86400) duration = 86400;
-                if (duration < 0) duration = 0;
+                  if (duration > 86400) duration = 86400;
+                  if (duration < 0) duration = 0;
 
-                return (
-                  <div
-                    key={run.id}
-                    onClick={() => window.open(run.html_url, "_blank")}
-                    className="group bg-card rounded-lg border p-3 active:bg-accent/50 transition-colors space-y-2.5"
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className="shrink-0 mt-1">
-                        <div
-                          className={cn(
-                            "h-2.5 w-2.5 rounded-full",
-                            statusColor,
-                            run.status === "in_progress" && "animate-pulse"
-                          )}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-semibold text-sm leading-tight line-clamp-2">
-                            {run.name}
-                          </h3>
-                          <Badge
-                            variant={
-                              run.conclusion === "success"
-                                ? "default"
-                                : run.conclusion === "failure"
-                                ? "destructive"
-                                : "secondary"
-                            }
-                            className="shrink-0 text-xs h-5"
-                          >
-                            {statusText}
-                          </Badge>
+                  return (
+                    <div
+                      key={run.id}
+                      onClick={() => window.open(run.html_url, "_blank")}
+                      className="group bg-card rounded-lg border p-3 active:bg-accent/50 transition-colors space-y-2.5"
+                    >
+                      <div className="flex items-start gap-2">
+                        <div className="shrink-0 mt-1">
+                          <div
+                            className={cn(
+                              "h-2.5 w-2.5 rounded-full",
+                              statusColor,
+                              run.status === "in_progress" && "animate-pulse"
+                            )}
+                          />
                         </div>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {run.repository.full_name}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <h3 className="font-semibold text-sm leading-tight line-clamp-2">
+                              {run.name}
+                            </h3>
+                            <Badge
+                              variant={
+                                run.conclusion === "success"
+                                  ? "default"
+                                  : run.conclusion === "failure"
+                                  ? "destructive"
+                                  : "secondary"
+                              }
+                              className="shrink-0 text-xs h-5"
+                            >
+                              {statusText}
+                            </Badge>
+                          </div>
+                          <a
+                            href={`https://github.com/${run.repository.full_name}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-xs text-muted-foreground truncate hover:text-foreground hover:underline z-10 relative"
+                          >
+                            {run.repository.full_name}
+                          </a>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-start gap-1.5 pl-4">
-                      <GitCommit className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                        {run.head_commit.message}
-                      </p>
-                    </div>
+                      <div className="flex items-start gap-1.5 pl-4">
+                        <GitCommit className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
+                        <a
+                          href={`https://github.com/${run.repository.full_name}/commit/${run.head_sha}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs text-muted-foreground line-clamp-2 leading-relaxed hover:text-foreground hover:underline z-10 relative"
+                        >
+                          {run.head_commit.message}
+                        </a>
+                      </div>
 
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground pl-4 flex-wrap">
-                      <div className="flex items-center gap-1.5">
-                        <Avatar className="h-4 w-4">
-                          <AvatarImage src={run.actor.avatar_url} />
-                          <AvatarFallback className="text-[8px]">
-                            {run.actor.login[0].toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="truncate max-w-[80px]">
-                          {run.actor.login}
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground pl-4 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <Avatar className="h-4 w-4">
+                            <AvatarImage src={run.actor.avatar_url} />
+                            <AvatarFallback className="text-[8px]">
+                              {run.actor.login[0].toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <a
+                            href={`https://github.com/${run.actor.login}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="truncate max-w-[80px] hover:text-foreground hover:underline z-10 relative"
+                          >
+                            {run.actor.login}
+                          </a>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <GitBranch className="h-3 w-3" />
+                          <a
+                            href={`https://github.com/${run.repository.full_name}/tree/${run.head_branch}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-mono truncate max-w-[100px] hover:text-foreground hover:underline z-10 relative"
+                          >
+                            {run.head_branch}
+                          </a>
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{formatDuration(duration)}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end pl-4">
+                        <span className="text-xs text-muted-foreground">
+                          {formatRelativeTime(run.created_at)}
                         </span>
                       </div>
-
-                      <div className="flex items-center gap-1">
-                        <GitBranch className="h-3 w-3" />
-                        <span className="font-mono truncate max-w-[100px]">
-                          {run.head_branch}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{formatDuration(duration)}</span>
-                      </div>
                     </div>
-
-                    <div className="flex justify-end pl-4">
-                      <span className="text-xs text-muted-foreground">
-                        {formatRelativeTime(run.created_at)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </ScrollArea>
-      </div>
+                  );
+                })
+              )}
+            </div>
+          </ScrollArea>
+        </CollapsibleContent>
+      </Collapsible>
     </>
   );
 }
