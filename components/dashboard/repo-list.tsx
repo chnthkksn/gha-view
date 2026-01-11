@@ -95,12 +95,14 @@ export function RepoList({ repositories, isLoading }: RepoListProps) {
       {/* Desktop Version */}
       <Card className="hidden md:block">
         <CardHeader>
-          <CardTitle>Repositories with Actions</CardTitle>
-          <CardDescription>
-            {repositories.length}{" "}
-            {repositories.length === 1 ? "repository" : "repositories"} with
-            GitHub Actions enabled
-          </CardDescription>
+          <div className="space-y-1.5">
+            <CardTitle>Repositories with Actions</CardTitle>
+            <CardDescription>
+              {repositories.length}{" "}
+              {repositories.length === 1 ? "repository" : "repositories"} with
+              GitHub Actions enabled
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[400px] sm:h-[500px] lg:h-[600px] pr-2 sm:pr-4">

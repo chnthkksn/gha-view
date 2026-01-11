@@ -121,7 +121,7 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
       <Card className="hidden md:block">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-            <div>
+            <div className="space-y-1.5">
               <CardTitle>Recent Workflow Runs</CardTitle>
               <CardDescription>
                 {runs.length} recent workflow{" "}
