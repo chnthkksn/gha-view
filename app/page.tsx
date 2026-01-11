@@ -6,6 +6,7 @@ import { GitHubLoginButton } from "@/components/auth/github-login-button";
 import { Github, Activity, Zap, BarChart3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { motion, Variants } from "framer-motion";
 
 export default function Home() {
   const { data: session, isPending } = useSession();
@@ -25,28 +26,84 @@ export default function Home() {
     );
   }
 
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        duration: 0.5,
+      },
+    },
+  };
+
+  const scaleVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 relative overflow-hidden">
-      <main className="relative z-10 flex flex-col items-center justify-center px-4 md:px-6 py-8 md:py-12 lg:py-24 text-center max-w-5xl w-full">
+      <motion.main
+        className="relative z-10 flex flex-col items-center justify-center px-4 md:px-6 py-8 md:py-12 lg:py-24 text-center max-w-5xl w-full"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Logo/Icon */}
-        <div className="mb-4 md:mb-6 lg:mb-8 p-3 md:p-4 rounded-xl md:rounded-2xl bg-slate-900 border border-slate-800">
+        <motion.div
+          variants={scaleVariants}
+          className="mb-4 md:mb-6 lg:mb-8 p-3 md:p-4 rounded-xl md:rounded-2xl bg-slate-900 border border-slate-800"
+        >
           <Github className="h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 text-white" />
-        </div>
+        </motion.div>
 
         {/* Hero text */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 lg:mb-6 tracking-tight px-2">
+        <motion.h1
+          variants={itemVariants}
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 lg:mb-6 tracking-tight px-2"
+        >
           GHA View
-        </h1>
+        </motion.h1>
 
-        <p className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 md:mb-12 max-w-2xl leading-relaxed px-4">
+        <motion.p
+          variants={itemVariants}
+          className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 md:mb-12 max-w-2xl leading-relaxed px-4"
+        >
           Exploring individual repositories to check status is a waste of time.
           <br className="hidden sm:block" />
           <span className="sm:hidden"> </span>
           Get a single, auto-refreshing view of your entire CI/CD pipeline.
-        </p>
+        </motion.p>
 
         {/* Dashboard Preview */}
-        <div className="mb-10 md:mb-16 relative w-full max-w-4xl px-2">
+        <motion.div
+          variants={scaleVariants}
+          className="mb-10 md:mb-16 relative w-full max-w-4xl px-2"
+        >
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl md:rounded-2xl blur opacity-25"></div>
           <div className="relative rounded-xl md:rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
             <img
@@ -55,10 +112,13 @@ export default function Home() {
               className="w-full h-auto"
             />
           </div>
-        </div>
+        </motion.div>
 
         {/* CTA */}
-        <div className="mb-10 md:mb-16 flex flex-col gap-3 md:gap-4 w-full max-w-sm px-4">
+        <motion.div
+          variants={itemVariants}
+          className="mb-10 md:mb-16 flex flex-col gap-3 md:gap-4 w-full max-w-sm px-4"
+        >
           <GitHubLoginButton />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -71,11 +131,17 @@ export default function Home() {
             </div>
           </div>
           <PasskeyLoginButton />
-        </div>
+        </motion.div>
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl">
-          <div className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+        <motion.div
+          variants={containerVariants}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl"
+        >
+          <motion.div
+            variants={itemVariants}
+            className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
+          >
             <div className="mb-3 md:mb-4 text-purple-400">
               <Activity className="h-6 w-6 mx-auto" />
             </div>
@@ -86,9 +152,12 @@ export default function Home() {
               Stop checking 20 different repos. See every running workflow in
               one list.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+          <motion.div
+            variants={itemVariants}
+            className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
+          >
             <div className="mb-3 md:mb-4 text-blue-400">
               <Zap className="h-6 w-6 mx-auto" />
             </div>
@@ -99,9 +168,12 @@ export default function Home() {
               Dashboard automatically updates so you can keep it on a second
               monitor.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+          <motion.div
+            variants={itemVariants}
+            className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
+          >
             <div className="mb-3 md:mb-4 text-pink-400">
               <BarChart3 className="h-6 w-6 mx-auto" />
             </div>
@@ -112,11 +184,14 @@ export default function Home() {
               Filter by user, branch, or status to find exactly what broke (and
               who broke it).
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Footer */}
-        <div className="mt-12 md:mt-16 text-center">
+        <motion.div
+          variants={itemVariants}
+          className="mt-12 md:mt-16 text-center"
+        >
           <a
             href="https://github.com/chnthkksn/gha-view"
             target="_blank"
@@ -126,8 +201,8 @@ export default function Home() {
             <Github className="h-4 w-4" />
             <span>Star on GitHub</span>
           </a>
-        </div>
-      </main>
+        </motion.div>
+      </motion.main>
     </div>
   );
 }
