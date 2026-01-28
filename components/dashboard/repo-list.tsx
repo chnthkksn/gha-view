@@ -268,23 +268,25 @@ export function RepoList({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground pl-6 flex-wrap">
-                    {repo.language && (
-                      <div className="flex items-center gap-1.5">
-                        <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                        <span>{repo.language}</span>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground pl-6 w-full pr-2">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {repo.language && (
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                          <span>{repo.language}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Star className="h-3 w-3" />
+                        <span>{repo.stargazers_count}</span>
                       </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3" />
-                      <span>{repo.stargazers_count}</span>
+                      <div className="flex items-center gap-1">
+                        <GitBranch className="h-3 w-3" />
+                        <span>{formatRelativeTime(repo.updated_at)}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <GitBranch className="h-3 w-3" />
-                      <span>{formatRelativeTime(repo.updated_at)}</span>
-                    </div>
-                  </div>
-                  {repo.stats && (
+
+                    {repo.stats && (
                       <div className="flex items-center gap-1">
                         <span
                           className={`font-medium ${
@@ -299,9 +301,10 @@ export function RepoList({
                         </span>
                         success
                       </div>
-                  )}
+                    )}
+                  </div>
                   {repo.stats && (
-                    <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground px-4 pb-2">
+                    <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground px-4 pb-1 pt-2 border-t border-border/50 mt-2">
                        <div className="flex items-center gap-1">
                         <span className="font-medium text-foreground">
                           {formatDurationCompact(repo.stats.minDuration || 0)}
