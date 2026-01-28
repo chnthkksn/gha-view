@@ -2,7 +2,7 @@
 
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import PullToRefresh from "react-simple-pull-to-refresh";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { RepoList } from "@/components/dashboard/repo-list";
@@ -10,7 +10,7 @@ import { WorkflowRuns } from "@/components/dashboard/workflow-runs";
 import { RateLimitIndicator } from "@/components/dashboard/rate-limit-indicator";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { MobileStatusBar } from "@/components/dashboard/mobile-status-bar";
-import { useRepositories, useWorkflowRuns } from "@/hooks/use-github-data";
+import { useRepositories } from "@/hooks/use-github-data";
 import { calculateWorkflowStats } from "@/lib/utils/github-helpers";
 import { Github, RefreshCw } from "lucide-react";
 import { useSetDashboard } from "@/contexts/dashboard-context";
@@ -34,23 +34,29 @@ export default function DashboardPage() {
     refetchInterval: isAutoRefreshEnabled ? AUTO_REFRESH_INTERVAL : false,
   });
 
-  const {
-    data: workflowRuns = [],
-    isLoading: runsLoading,
-    refetch: refetchRuns,
-    isRefetching: runsRefetching,
-    dataUpdatedAt: runsUpdatedAt,
-  } = useWorkflowRuns({
-    enabled: !!session?.user,
-    refetchInterval: isAutoRefreshEnabled ? AUTO_REFRESH_INTERVAL : false,
-  });
+  // Extract recent runs from repositories for the "Latest Runs" section
+  // This avoids a second API call to getAllWorkflowRuns
+  const workflowRuns = useMemo(() => {
+    if (!repositories) return [];
+    return repositories
+      .flatMap((repo) => repo.recent_runs || [])
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+  }, [repositories]);
+
+  // We no longer need a separate loading state for runs since they come with repos
+  const runsLoading = reposLoading;
+  const runsRefetching = reposRefetching; // Runs refetching status is tied to repos
+  const runsUpdatedAt = reposUpdatedAt; // Runs updated at status is tied to repos
 
   const stats = calculateWorkflowStats(workflowRuns, repositories.length);
   const isRefreshing = reposRefetching || runsRefetching;
   const lastUpdated = Math.max(reposUpdatedAt || 0, runsUpdatedAt || 0);
 
   const handleRefresh = async () => {
-    await Promise.all([refetchRepos(), refetchRuns()]);
+    await Promise.all([refetchRepos()]); // Only need to refetch repos now
   };
 
   // Update dashboard context with current state
@@ -58,7 +64,6 @@ export default function DashboardPage() {
     setDashboard({
       onRefresh: () => {
         refetchRepos();
-        refetchRuns();
       },
       isRefreshing,
       isAutoRefreshEnabled,
@@ -68,7 +73,6 @@ export default function DashboardPage() {
     isRefreshing,
     isAutoRefreshEnabled,
     refetchRepos,
-    refetchRuns,
     setDashboard,
   ]);
 
@@ -131,7 +135,6 @@ export default function DashboardPage() {
         isAutoRefreshEnabled={isAutoRefreshEnabled}
         onRefresh={() => {
           refetchRepos();
-          refetchRuns();
         }}
         onAutoRefreshToggle={setIsAutoRefreshEnabled}
       />

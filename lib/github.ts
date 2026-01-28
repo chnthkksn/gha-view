@@ -1,4 +1,7 @@
 import { Octokit } from "octokit";
+import {
+  calculateDuration,
+} from "@/lib/utils/github-helpers";
 import type {
   GitHubRepository,
   GitHubWorkflowRun,
@@ -141,25 +144,118 @@ export class GitHubClient {
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       );
 
-      // Map GraphQL response to our GitHubRepository type
-      return validRepos.map((repo: any) => ({
-        id: repo.databaseId,
-        name: repo.name,
-        full_name: `${repo.owner.login}/${repo.name}`,
-        description: repo.description,
-        private: repo.isPrivate,
-        html_url: repo.url,
-        updated_at: repo.updatedAt,
-        pushed_at: repo.pushedAt,
-        language: null,
-        stargazers_count: repo.stargazerCount,
-        has_actions: true,
-        owner: {
-          login: repo.owner.login,
-          avatar_url: repo.owner.avatarUrl,
-          type: repo.owner.__typename,
-        },
-      }));
+      // Hybrid approach: Fetch stats for each repo using REST in parallel batches
+      // We do this because GraphQL doesn't easily expose extensive run history/stats on the Repository object directly
+      const reposWithStats = [];
+      const BATCH_SIZE = 5;
+      
+      for (let i = 0; i < validRepos.length; i += BATCH_SIZE) {
+        const batch = validRepos.slice(i, i + BATCH_SIZE);
+        
+        const batchResults = await Promise.all(
+          batch.map(async (repo: any) => {
+             try {
+               // Fetch recent runs (limit 30 as per plan)
+               const runsResponse = await this.octokit.rest.actions.listWorkflowRunsForRepo({
+                 owner: repo.owner.login,
+                 repo: repo.name,
+                 per_page: 30, 
+               });
+
+               const rawRuns = runsResponse.data.workflow_runs;
+
+               // Filter out runs older than 400 days to avoid skewed stats (like 24h+ durations for stale runs)
+               const cutoffDate = new Date();
+               cutoffDate.setDate(cutoffDate.getDate() - 400);
+               
+               const runs = rawRuns.filter((run) => {
+                 const runDate = new Date(run.created_at);
+                 return runDate > cutoffDate;
+               });
+               
+               // Calculate stats
+               const completedRuns = runs.filter((run) => run.status === "completed");
+               const successfulRuns = completedRuns.filter((run) => run.conclusion === "success").length;
+               const failedRuns = completedRuns.filter((run) => run.conclusion === "failure").length;
+
+               const successRate = completedRuns.length > 0 
+                 ? Math.round((successfulRuns / completedRuns.length) * 100) 
+                 : 0;
+                
+               const failureRate = completedRuns.length > 0
+                 ? Math.round((failedRuns / completedRuns.length) * 100)
+                 : 0;
+
+               const durations = completedRuns
+                  .map((run) => {
+                    const start = run.run_started_at || run.created_at;
+                    const end = run.updated_at;
+                    const duration = calculateDuration(start, end);
+                    return duration > 0 && duration < 86400 ? duration : 0;
+                  })
+                  .filter((d) => d > 0);
+
+                const totalDuration = durations.reduce((a, b) => a + b, 0);
+                const avgDuration = durations.length > 0 ? Math.round(totalDuration / durations.length) : 0;
+                const minDuration = durations.length > 0 ? Math.min(...durations) : 0;
+                const maxDuration = durations.length > 0 ? Math.max(...durations) : 0;
+
+               return {
+                  id: repo.databaseId,
+                  name: repo.name,
+                  full_name: `${repo.owner.login}/${repo.name}`,
+                  description: repo.description,
+                  private: repo.isPrivate,
+                  html_url: repo.url,
+                  updated_at: repo.updatedAt,
+                  pushed_at: repo.pushedAt,
+                  language: null,
+                  stargazers_count: repo.stargazerCount,
+                  has_actions: true,
+                  owner: {
+                     login: repo.owner.login,
+                     avatar_url: repo.owner.avatarUrl,
+                     type: repo.owner.__typename,
+                   },
+                   recent_runs: runs, // Attach fetched runs for page usage
+                   stats: {
+                     // totalRuns removed as requested to avoid extra overhead if not needed 
+                     // (though we have total_count from API, user requested hiding it)
+                     successRate,
+                     failureRate,
+                     avgDuration,
+                     minDuration,
+                     maxDuration,
+                   },
+                };
+             } catch (error) {
+               console.error(`Failed to fetch stats for ${repo.name}`, error);
+               // Return repo without stats if failed
+               return {
+                  id: repo.databaseId,
+                  name: repo.name,
+                  full_name: `${repo.owner.login}/${repo.name}`,
+                  description: repo.description,
+                  private: repo.isPrivate,
+                  html_url: repo.url,
+                  updated_at: repo.updatedAt,
+                  pushed_at: repo.pushedAt,
+                  language: null,
+                  stargazers_count: repo.stargazerCount,
+                  has_actions: true,
+                  owner: {
+                    login: repo.owner.login,
+                    avatar_url: repo.owner.avatarUrl,
+                    type: repo.owner.__typename,
+                  },
+               };
+             }
+          })
+        );
+        reposWithStats.push(...batchResults);
+      }
+
+      return reposWithStats;
     } catch (error) {
       console.error(
         "GraphQL optimization failed, falling back to REST:",

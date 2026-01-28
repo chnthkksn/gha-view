@@ -16,8 +16,11 @@ import {
   User,
   Building,
 } from "lucide-react";
-import type { GitHubRepository } from "@/types/github";
-import { formatRelativeTime } from "@/lib/utils/github-helpers";
+import type { GitHubRepository, GitHubWorkflowRun } from "@/types/github";
+import {
+  formatRelativeTime,
+  formatDurationCompact,
+} from "@/lib/utils/github-helpers";
 import {
   Collapsible,
   CollapsibleContent,
@@ -28,9 +31,14 @@ import { ChevronDown } from "lucide-react";
 interface RepoListProps {
   repositories: GitHubRepository[];
   isLoading?: boolean;
+  workflowRuns?: GitHubWorkflowRun[];
 }
 
-export function RepoList({ repositories, isLoading }: RepoListProps) {
+export function RepoList({
+  repositories,
+  isLoading,
+}: RepoListProps) {
+// Removed memoized stats calculation
   if (isLoading) {
     return (
       <>
@@ -142,22 +150,70 @@ export function RepoList({ repositories, isLoading }: RepoListProps) {
                         <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
                       </div>
 
-                      <div className="flex items-center gap-3 sm:gap-4 text-xs text-muted-foreground flex-wrap">
-                        {repo.language && (
+                      <div className="flex items-center justify-between text-xs text-muted-foreground w-full">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          {repo.language && (
+                            <div className="flex items-center gap-1">
+                              <div className="h-3 w-3 rounded-full bg-blue-500" />
+                              {repo.language}
+                            </div>
+                          )}
                           <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full bg-blue-500" />
-                            {repo.language}
+                            <Star className="h-3 w-3" />
+                            {repo.stargazers_count}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <GitBranch className="h-3 w-3" />
+                            Updated {formatRelativeTime(repo.updated_at)}
+                          </div>
+                        </div>
+
+                        {repo.stats && (
+                          <div className="flex items-center gap-1">
+                            <span
+                              className={`font-medium ${
+                                (repo.stats.successRate || 0) >= 90
+                                  ? "text-green-500"
+                                  : (repo.stats.successRate || 0) >= 50
+                                  ? "text-yellow-500"
+                                  : "text-red-500"
+                              }`}
+                            >
+                              {repo.stats.successRate}%
+                            </span>
+                            success
                           </div>
                         )}
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3" />
-                          {repo.stargazers_count}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <GitBranch className="h-3 w-3" />
-                          Updated {formatRelativeTime(repo.updated_at)}
-                        </div>
                       </div>
+
+                      {repo.stats && (
+                        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground pt-2 border-t border-border/50 w-full mt-2">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-foreground">
+                              {formatDurationCompact(
+                                repo.stats.minDuration || 0
+                              )}
+                            </span>
+                            min
+                          </div>
+                          <div className="flex items-center justify-center gap-1">
+                            <span className="font-medium text-foreground">
+                              {formatDurationCompact(
+                                repo.stats.avgDuration || 0
+                              )}
+                            </span>
+                            avg
+                          </div>
+                          <div className="flex items-center justify-end gap-1">
+                            <span className="font-medium text-foreground">
+                              {formatDurationCompact(
+                                repo.stats.maxDuration || 0
+                              )}
+                            </span>
+                            max
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </a>
@@ -228,6 +284,44 @@ export function RepoList({ repositories, isLoading }: RepoListProps) {
                       <span>{formatRelativeTime(repo.updated_at)}</span>
                     </div>
                   </div>
+                  {repo.stats && (
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={`font-medium ${
+                            (repo.stats.successRate || 0) >= 90
+                              ? "text-green-500"
+                              : (repo.stats.successRate || 0) >= 50
+                              ? "text-yellow-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {repo.stats.successRate}%
+                        </span>
+                        success
+                      </div>
+                  )}
+                  {repo.stats && (
+                    <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground px-4 pb-2">
+                       <div className="flex items-center gap-1">
+                        <span className="font-medium text-foreground">
+                          {formatDurationCompact(repo.stats.minDuration || 0)}
+                        </span>
+                        min
+                      </div>
+                      <div className="flex items-center justify-center gap-1">
+                          <span className="font-medium text-foreground">
+                            {formatDurationCompact(repo.stats.avgDuration || 0)}
+                          </span>
+                          avg
+                        </div>
+                      <div className="flex items-center justify-end gap-1">
+                        <span className="font-medium text-foreground">
+                          {formatDurationCompact(repo.stats.maxDuration || 0)}
+                        </span>
+                        max
+                      </div>
+                    </div>
+                  )}
                 </a>
               ))}
             </div>

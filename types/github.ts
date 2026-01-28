@@ -17,6 +17,14 @@ export interface GitHubRepository {
     avatar_url: string;
     type?: string;
   };
+  stats?: {
+    successRate: number;
+    failureRate: number;
+    avgDuration: number;
+    minDuration: number;
+    maxDuration: number;
+  };
+  recent_runs?: GitHubWorkflowRun[];
 }
 
 export interface GitHubWorkflowRun {
@@ -100,4 +108,13 @@ export interface WorkflowStats {
   totalRuns: number;
   avgDuration: number; // in seconds
   activeRunsLast24h: number;
+}
+
+export interface RepoWorkflowStats {
+  repoName: string;
+  totalRuns: number;
+  successRate: number;
+  avgDuration: number;
+  minDuration: number;
+  maxDuration: number;
 }

@@ -200,3 +200,60 @@ export function groupRunsByRepository(
     return acc;
   }, {} as Record<string, GitHubWorkflowRun[]>);
 }
+
+/**
+ * Format duration in a compact human-readable format (e.g., "1m 30s")
+ */
+export function formatDurationCompact(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  if (minutes < 60) return `${minutes}m ${remainingSeconds}s`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${hours}h ${remainingMinutes}m`;
+}
+
+/**
+ * Calculate per-repository workflow statistics
+ */
+export function calculateRepoStats(
+  runs: GitHubWorkflowRun[],
+  repoName: string
+): import("@/types/github").RepoWorkflowStats {
+  const completedRuns = runs.filter((run) => run.status === "completed");
+  const successfulRuns = completedRuns.filter(
+    (run) => run.conclusion === "success"
+  ).length;
+
+  const successRate =
+    completedRuns.length > 0
+      ? Math.round((successfulRuns / completedRuns.length) * 100)
+      : 0;
+
+  // Duration calculations (only for successful runs to be meaningful, or all completed?)
+  // Usually usage stats include all completed runs.
+  const durations = completedRuns
+    .map((run) => {
+      const start = run.run_started_at || run.created_at;
+      const end = run.updated_at;
+      const duration = calculateDuration(start, end);
+      return duration > 0 && duration < 86400 ? duration : 0;
+    })
+    .filter((d) => d > 0);
+
+  const totalDuration = durations.reduce((a, b) => a + b, 0);
+  const avgDuration =
+    durations.length > 0 ? Math.round(totalDuration / durations.length) : 0;
+  const minDuration = durations.length > 0 ? Math.min(...durations) : 0;
+  const maxDuration = durations.length > 0 ? Math.max(...durations) : 0;
+
+  return {
+    repoName,
+    totalRuns: runs.length,
+    successRate,
+    avgDuration,
+    minDuration,
+    maxDuration,
+  };
+}
