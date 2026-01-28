@@ -47,11 +47,11 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      run.name.toLowerCase().includes(query) ||
+      (run.name || "").toLowerCase().includes(query) ||
       run.repository.full_name.toLowerCase().includes(query) ||
-      run.head_branch.toLowerCase().includes(query) ||
-      run.head_commit.message.toLowerCase().includes(query) ||
-      run.actor.login.toLowerCase().includes(query)
+      (run.head_branch || "").toLowerCase().includes(query) ||
+      (run.head_commit?.message || "").toLowerCase().includes(query) ||
+      (run.actor?.login || "").toLowerCase().includes(query)
     );
   });
 
@@ -155,12 +155,12 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
               ) : (
                 filteredRuns.map((run) => {
                   const statusColor = getStatusColor(
-                    run.status,
-                    run.conclusion
+                    run.status || "",
+                    run.conclusion || ""
                   );
-                  const statusText = getStatusText(run.status, run.conclusion);
+                  const statusText = getStatusText(run.status || "", run.conclusion || "");
                   let duration = calculateDuration(
-                    run.run_started_at,
+                    run.run_started_at || run.created_at,
                     run.status === "completed" ? run.updated_at : undefined
                   );
 
@@ -205,9 +205,9 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
                             </div>
                             <Badge
                               variant={
-                                run.conclusion === "success"
+                                (run.conclusion || "") === "success"
                                   ? "default"
-                                  : run.conclusion === "failure"
+                                  : (run.conclusion || "") === "failure"
                                   ? "destructive"
                                   : "secondary"
                               }
@@ -226,26 +226,26 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
                               onClick={(e) => e.stopPropagation()}
                               className="text-muted-foreground hover:text-foreground hover:underline line-clamp-2 transition-colors"
                             >
-                              {run.head_commit.message}
+                              {run.head_commit?.message || "No commit message"}
                             </a>
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-muted-foreground w-full pt-1">
                             <div className="flex items-center gap-1 z-10 relative">
                               <Avatar className="h-3 w-3 sm:h-4 sm:w-4">
-                                <AvatarImage src={run.actor.avatar_url} />
+                                <AvatarImage src={run.actor?.avatar_url} />
                                 <AvatarFallback>
-                                  {run.actor.login[0].toUpperCase()}
+                                  {(run.actor?.login || "?")[0].toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
                               <a
-                                href={`https://github.com/${run.actor.login}`}
+                                href={`https://github.com/${run.actor?.login}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
                                 className="hover:text-foreground hover:underline transition-colors truncate max-w-[100px] sm:max-w-none"
                               >
-                                {run.actor.login}
+                                {run.actor?.login || "Unknown"}
                               </a>
                             </div>
                             <div className="flex items-center gap-1">
@@ -318,12 +318,12 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
               ) : (
                 filteredRuns.map((run) => {
                   const statusColor = getStatusColor(
-                    run.status,
-                    run.conclusion
+                    run.status || "",
+                    run.conclusion || ""
                   );
-                  const statusText = getStatusText(run.status, run.conclusion);
+                  const statusText = getStatusText(run.status || "", run.conclusion || "");
                   let duration = calculateDuration(
-                    run.run_started_at,
+                    run.run_started_at || run.created_at,
                     run.status === "completed" ? run.updated_at : undefined
                   );
 
@@ -353,9 +353,9 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
                             </h3>
                             <Badge
                               variant={
-                                run.conclusion === "success"
+                                (run.conclusion || "") === "success"
                                   ? "default"
-                                  : run.conclusion === "failure"
+                                  : (run.conclusion || "") === "failure"
                                   ? "destructive"
                                   : "secondary"
                               }
@@ -385,26 +385,26 @@ export function WorkflowRuns({ runs, isLoading }: WorkflowRunsProps) {
                           onClick={(e) => e.stopPropagation()}
                           className="text-xs text-muted-foreground line-clamp-2 leading-relaxed hover:text-foreground hover:underline z-10 relative"
                         >
-                          {run.head_commit.message}
+                          {run.head_commit?.message || "No commit message"}
                         </a>
                       </div>
 
                       <div className="flex items-center gap-3 text-xs text-muted-foreground pl-4 flex-wrap">
                         <div className="flex items-center gap-1.5">
                           <Avatar className="h-4 w-4">
-                            <AvatarImage src={run.actor.avatar_url} />
+                            <AvatarImage src={run.actor?.avatar_url} />
                             <AvatarFallback className="text-[8px]">
-                              {run.actor.login[0].toUpperCase()}
+                              {(run.actor?.login || "?")[0].toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <a
-                            href={`https://github.com/${run.actor.login}`}
+                            href={`https://github.com/${run.actor?.login}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             className="truncate max-w-[80px] hover:text-foreground hover:underline z-10 relative"
                           >
-                            {run.actor.login}
+                            {run.actor?.login || "Unknown"}
                           </a>
                         </div>
 

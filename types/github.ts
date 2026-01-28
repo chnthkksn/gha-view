@@ -29,24 +29,16 @@ export interface GitHubRepository {
 
 export interface GitHubWorkflowRun {
   id: number;
-  name: string;
-  head_branch: string;
+  name?: string | null;
+  head_branch: string | null;
   head_sha: string;
-  status: "queued" | "in_progress" | "completed";
-  conclusion:
-    | "success"
-    | "failure"
-    | "neutral"
-    | "cancelled"
-    | "skipped"
-    | "timed_out"
-    | "action_required"
-    | null;
+  status: string | null;
+  conclusion: string | null;
   workflow_id: number;
   html_url: string;
   created_at: string;
   updated_at: string;
-  run_started_at: string;
+  run_started_at?: string;
   run_number: number;
   event: string;
   repository: {
@@ -58,12 +50,12 @@ export interface GitHubWorkflowRun {
     author: {
       name: string;
       email: string;
-    };
-  };
-  actor: {
+    } | null;
+  } | null;
+  actor?: {
     login: string;
     avatar_url: string;
-  };
+  } | null;
 }
 
 export interface GitHubWorkflow {

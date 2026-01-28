@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo } from "react";
 import PullToRefresh from "react-simple-pull-to-refresh";
 import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { RepoList } from "@/components/dashboard/repo-list";
+import type { GitHubRepository, GitHubWorkflowRun } from "@/types/github";
 import { WorkflowRuns } from "@/components/dashboard/workflow-runs";
 import { RateLimitIndicator } from "@/components/dashboard/rate-limit-indicator";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -39,9 +40,9 @@ export default function DashboardPage() {
   const workflowRuns = useMemo(() => {
     if (!repositories) return [];
     return repositories
-      .flatMap((repo) => repo.recent_runs || [])
+      .flatMap((repo: GitHubRepository) => repo.recent_runs || [])
       .sort(
-        (a, b) =>
+        (a: GitHubWorkflowRun, b: GitHubWorkflowRun) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
   }, [repositories]);
