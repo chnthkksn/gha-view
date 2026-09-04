@@ -36,16 +36,16 @@ export function PasskeyLoginButton() {
   return (
     <Button
       variant="outline"
-      className="w-full gap-2 bg-white/5 border-white/10 hover:bg-white/10 text-white hover:text-white"
+      className="w-full gap-2 border-white/[0.14] hover:bg-white/[0.06] text-foreground font-semibold text-[13px] h-auto py-3"
       onClick={handleSignIn}
       disabled={isLoading}
     >
       {isLoading ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Key className="mr-2 h-4 w-4" />
+        <Key className="h-4 w-4" />
       )}
-      Sign in with Passkey
+      Sign in with passkey
     </Button>
   );
 }

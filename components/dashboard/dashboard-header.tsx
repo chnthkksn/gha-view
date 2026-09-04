@@ -1,8 +1,8 @@
 "use client";
 
 import { useSession, signOut } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CompactRateLimit } from "@/components/dashboard/compact-rate-limit";
 import { formatTime } from "@/lib/utils/github-helpers";
@@ -15,26 +15,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ModeToggle } from "@/components/mode-toggle";
 import { AutoRefreshToggle } from "@/components/dashboard/auto-refresh-toggle";
+import { useDashboard } from "@/contexts/dashboard-context";
+import { cn } from "@/lib/utils";
 
-interface DashboardHeaderProps {
-  lastUpdated: number;
-  isRefreshing: boolean;
-  isAutoRefreshEnabled: boolean;
-  onRefresh: () => void;
-  onAutoRefreshToggle: (enabled: boolean) => void;
-}
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "dashboard" },
+  { href: "/dashboard/profile", label: "profile" },
+  { href: "/dashboard/security", label: "security" },
+];
 
-export function DashboardHeader({
-  lastUpdated,
-  isRefreshing,
-  isAutoRefreshEnabled,
-  onRefresh,
-  onAutoRefreshToggle,
-}: DashboardHeaderProps) {
+export function DashboardHeader() {
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const {
+    onRefresh,
+    isRefreshing,
+    isAutoRefreshEnabled,
+    onAutoRefreshToggle,
+    lastUpdated,
+  } = useDashboard();
+
+  const isDashboardHome = pathname === "/dashboard";
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,75 +47,93 @@ export function DashboardHeader({
   if (!session?.user) return null;
 
   return (
-    <header className="hidden md:block sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="px-3 sm:px-4 md:px-6 flex h-14 sm:h-16 items-center justify-between max-w-[2000px] mx-auto">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-purple-600 to-blue-600">
-            <Github className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+    <header className="hidden md:block sticky top-0 z-50 w-full bg-[#0F1216] border-b border-border">
+      <div className="px-5 flex h-14 items-center gap-6 max-w-[1600px] mx-auto">
+        <div className="flex items-center gap-2.5 min-w-0 shrink-0">
+          <div className="w-[26px] h-[26px] rounded-md bg-primary flex items-center justify-center shrink-0">
+            <span className="text-primary-foreground font-extrabold text-[13px]">
+              gh
+            </span>
           </div>
-          <div className="min-w-0">
-            <h1 className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              GHA View
-            </h1>
-            <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
-              <p className="hidden md:inline">Live workflow monitoring</p>
-              {lastUpdated > 0 && (
-                <>
-                  <span className="hidden md:inline">•</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <span className="hidden sm:inline">Updated</span>{" "}
-                    {formatTime(lastUpdated)}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
+          <span className="font-bold text-[15px] tracking-tight">
+            gha-view
+          </span>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-          <div className="hidden md:block">
-            <AutoRefreshToggle
-              isEnabled={isAutoRefreshEnabled}
-              onToggle={onAutoRefreshToggle}
-            />
-          </div>
-          <div className="hidden md:block h-6 w-px bg-border" />
-          {/* Separator */}
-          <div className="hidden sm:block">
-            <CompactRateLimit />
-          </div>
-          <ModeToggle />
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 sm:h-10 sm:w-10"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-          >
-            <RefreshCw
-              className={`h-4 w-4 sm:h-[1.2rem] sm:w-[1.2rem] ${
-                isRefreshing ? "animate-spin" : ""
-              }`}
-            />
-            <span className="sr-only">Refresh</span>
-          </Button>
+        <nav className="flex items-center gap-1">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "px-2.5 py-1.5 rounded-md text-xs transition-colors",
+                  isActive
+                    ? "bg-white/[0.06] text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-4 ml-auto">
+          {isDashboardHome && (
+            <>
+              {!!lastUpdated && lastUpdated > 0 && (
+                <div className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  <span>Updated {formatTime(lastUpdated)}</span>
+                </div>
+              )}
+              {onAutoRefreshToggle && (
+                <AutoRefreshToggle
+                  isEnabled={!!isAutoRefreshEnabled}
+                  onToggle={onAutoRefreshToggle}
+                />
+              )}
+              <div className="h-5 w-px bg-border" />
+              <CompactRateLimit />
+              {onRefresh && (
+                <button
+                  onClick={onRefresh}
+                  disabled={isRefreshing}
+                  title="Refresh"
+                  className="flex items-center justify-center h-[30px] w-[30px] rounded-md border border-white/10 text-foreground cursor-pointer disabled:opacity-50 hover:bg-white/[0.04] transition-colors"
+                >
+                  <RefreshCw
+                    className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")}
+                  />
+                  <span className="sr-only">Refresh</span>
+                </button>
+              )}
+              <a
+                href="https://github.com/chnthkksn/gha-view"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden xl:flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-xs"
+              >
+                ★ star
+              </a>
+              <div className="h-5 w-px bg-border" />
+            </>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full"
-              >
-                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-primary/20 hover:border-primary transition-colors">
+              <button className="relative h-7 w-7 rounded-full cursor-pointer">
+                <Avatar className="h-7 w-7 border border-white/10">
                   <AvatarImage
                     src={session.user.image || undefined}
                     alt={session.user.name || ""}
                   />
-                  <AvatarFallback>
+                  <AvatarFallback className="bg-[#1B1F26] text-muted-foreground text-[11px] font-semibold">
                     {session.user.name?.[0]?.toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
-              </Button>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
@@ -151,13 +172,14 @@ export function DashboardHeader({
                 }}
                 className="cursor-pointer"
               >
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <Github className="mr-2 h-4 w-4" />
                 <span>Manage Access</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}
-                className="text-red-600 dark:text-red-400 cursor-pointer"
+                variant="destructive"
+                className="cursor-pointer"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>

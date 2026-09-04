@@ -3,10 +3,58 @@
 import { useSession } from "@/lib/auth-client";
 import { PasskeyLoginButton } from "@/components/auth/passkey-login-button";
 import { GitHubLoginButton } from "@/components/auth/github-login-button";
-import { Github, Activity, Zap, BarChart3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { motion, Variants } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+const PREVIEW_ROWS = [
+  { status: "success", workflow: "CI", repo: "acme/web-app", time: "2m ago" },
+  {
+    status: "in_progress",
+    workflow: "Deploy / prod",
+    repo: "acme/api-gateway",
+    time: "now",
+  },
+  {
+    status: "success",
+    workflow: "Tests",
+    repo: "acme/design-system",
+    time: "6m ago",
+  },
+  {
+    status: "failure",
+    workflow: "Build",
+    repo: "acme/ml-training",
+    time: "9m ago",
+  },
+  {
+    status: "success",
+    workflow: "Security Scan",
+    repo: "acme/search-index",
+    time: "14m ago",
+  },
+];
+
+const STATUS_COLOR: Record<string, string> = {
+  success: "bg-primary",
+  in_progress: "bg-warning",
+  failure: "bg-destructive",
+};
+
+const FEATURES = [
+  {
+    title: "Unified view",
+    description: "Every running workflow across every repo, one list.",
+  },
+  {
+    title: "Auto-refresh",
+    description: "Leave it running on a second monitor. It stays current.",
+  },
+  {
+    title: "Focus",
+    description: "Filter by user, branch, or status to find what broke.",
+  },
+];
 
 export default function Home() {
   const { data: session, isPending } = useSession();
@@ -20,201 +68,99 @@ export default function Home() {
 
   if (isPending) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950">
-        <motion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <Github className="h-12 w-12 text-white" />
-        </motion.div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="animate-pulse text-sm text-muted-foreground">
+          loading...
+        </div>
       </div>
     );
   }
 
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-        duration: 0.5,
-      },
-    },
-  };
-
-  const scaleVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-        duration: 0.5,
-      },
-    },
-  };
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 relative overflow-hidden">
-      <motion.main
-        className="relative z-10 flex flex-col items-center justify-center px-4 md:px-6 py-8 md:py-12 lg:py-24 text-center max-w-5xl w-full"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Logo/Icon */}
-        <motion.div
-          variants={scaleVariants}
-          className="mb-4 md:mb-6 lg:mb-8 p-3 md:p-4 rounded-xl md:rounded-2xl bg-slate-900 border border-slate-800"
-        >
-          <Github className="h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 text-white" />
-        </motion.div>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center py-16 px-5">
+      <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center mb-6">
+        <span className="text-primary-foreground font-extrabold text-xl">
+          gh
+        </span>
+      </div>
 
-        {/* Hero text */}
-        <motion.h1
-          variants={itemVariants}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-4 lg:mb-6 tracking-tight px-2"
-        >
-          GHA View
-        </motion.h1>
+      <h1 className="text-4xl md:text-[44px] font-extrabold tracking-tight mb-3">
+        gha-view
+      </h1>
+      <p className="text-muted-foreground text-[15px] max-w-[480px] text-center leading-relaxed mb-10">
+        Checking Actions status across a dozen repos, one tab at a time,
+        wastes your morning. One auto-refreshing view of every workflow,
+        everywhere.
+      </p>
 
-        <motion.p
-          variants={itemVariants}
-          className="text-base sm:text-lg md:text-xl text-slate-400 mb-8 md:mb-12 max-w-2xl leading-relaxed px-4"
-        >
-          Exploring individual repositories to check status is a waste of time.
-          <br className="hidden sm:block" />
-          <span className="sm:hidden"> </span>
-          Get a single, auto-refreshing view of your entire CI/CD pipeline.
-        </motion.p>
-
-        {/* Dashboard Preview */}
-        <motion.div
-          variants={scaleVariants}
-          className="mb-10 md:mb-16 relative w-full max-w-4xl px-2"
-        >
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl md:rounded-2xl blur opacity-25"></div>
-          <div className="relative rounded-xl md:rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
-            <img
-              src="/dashboard-preview.png"
-              alt="GHA View Dashboard"
-              className="w-full h-auto"
-            />
-          </div>
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-10 md:mb-16 flex flex-col gap-3 md:gap-4 w-full max-w-sm px-4"
-        >
-          <GitHubLoginButton />
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-800" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-slate-950 px-2 text-slate-600">
-                Or sign in with
+      <div className="w-full max-w-xl bg-card border border-border rounded-xl overflow-hidden mb-10 shadow-2xl">
+        <div className="px-3.5 py-2.5 border-b border-border flex items-center gap-2 bg-[#0F1216]">
+          <span className="w-[9px] h-[9px] rounded-full bg-destructive" />
+          <span className="w-[9px] h-[9px] rounded-full bg-warning" />
+          <span className="w-[9px] h-[9px] rounded-full bg-primary" />
+          <span className="ml-2 text-muted-foreground/70 text-[11px]">
+            workflow runs
+          </span>
+        </div>
+        <div className="py-1.5">
+          {PREVIEW_ROWS.map((row, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2.5 px-4 py-2 text-xs border-b border-white/[0.04] last:border-b-0"
+            >
+              <span
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full shrink-0",
+                  STATUS_COLOR[row.status],
+                  row.status === "in_progress" && "animate-pulse"
+                )}
+              />
+              <span className="font-medium flex-1 text-left">
+                {row.workflow}
+              </span>
+              <span className="text-muted-foreground/70">{row.repo}</span>
+              <span className="text-muted-foreground/70 w-[60px] text-right">
+                {row.time}
               </span>
             </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 w-full max-w-[320px] mb-14">
+        <GitHubLoginButton />
+        <div className="flex items-center gap-2.5 text-muted-foreground/70 text-[11px]">
+          <span className="flex-1 h-px bg-border" />
+          or
+          <span className="flex-1 h-px bg-border" />
+        </div>
+        <PasskeyLoginButton />
+      </div>
+
+      <div className="grid gap-3.5 w-full max-w-[760px] grid-cols-1 sm:grid-cols-3">
+        {FEATURES.map((feature) => (
+          <div
+            key={feature.title}
+            className="bg-card border border-border rounded-lg p-5"
+          >
+            <div className="font-bold text-[13px] mb-1.5">
+              {feature.title}
+            </div>
+            <div className="text-muted-foreground/70 text-xs leading-relaxed">
+              {feature.description}
+            </div>
           </div>
-          <PasskeyLoginButton />
-        </motion.div>
+        ))}
+      </div>
 
-        {/* Features */}
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl"
-        >
-          <motion.div
-            variants={itemVariants}
-            className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
-          >
-            <div className="mb-3 md:mb-4 text-purple-400">
-              <Activity className="h-6 w-6 mx-auto" />
-            </div>
-            <h3 className="text-base md:text-lg font-semibold text-white mb-2">
-              Unified View
-            </h3>
-            <p className="text-slate-500 text-sm">
-              Stop checking 20 different repos. See every running workflow in
-              one list.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
-          >
-            <div className="mb-3 md:mb-4 text-blue-400">
-              <Zap className="h-6 w-6 mx-auto" />
-            </div>
-            <h3 className="text-base md:text-lg font-semibold text-white mb-2">
-              Auto-Refresh
-            </h3>
-            <p className="text-slate-500 text-sm">
-              Dashboard automatically updates so you can keep it on a second
-              monitor.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="p-5 md:p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors"
-          >
-            <div className="mb-3 md:mb-4 text-pink-400">
-              <BarChart3 className="h-6 w-6 mx-auto" />
-            </div>
-            <h3 className="text-base md:text-lg font-semibold text-white mb-2">
-              Focus
-            </h3>
-            <p className="text-slate-500 text-sm">
-              Filter by user, branch, or status to find exactly what broke (and
-              who broke it).
-            </p>
-          </motion.div>
-        </motion.div>
-
-        {/* Footer */}
-        <motion.div
-          variants={itemVariants}
-          className="mt-12 md:mt-16 text-center"
-        >
-          <a
-            href="https://github.com/chnthkksn/gha-view"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-white transition-colors"
-          >
-            <Github className="h-4 w-4" />
-            <span>Star on GitHub</span>
-          </a>
-        </motion.div>
-      </motion.main>
+      <a
+        href="https://github.com/chnthkksn/gha-view"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-14 text-muted-foreground/70 hover:text-foreground text-xs flex items-center gap-1.5 transition-colors"
+      >
+        ★ Star on GitHub
+      </a>
     </div>
   );
 }

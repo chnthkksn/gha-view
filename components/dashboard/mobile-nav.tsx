@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Shield, LogOut, RefreshCw, Github } from "lucide-react";
-import { ModeToggle } from "@/components/mode-toggle";
 import { AutoRefreshToggle } from "@/components/dashboard/auto-refresh-toggle";
 import { CompactRateLimit } from "@/components/dashboard/compact-rate-limit";
 import { useDashboard } from "@/contexts/dashboard-context";
@@ -153,11 +152,6 @@ export function MobileNav() {
 
             {/* Settings */}
             <div className="space-y-3 pt-4 border-t">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Theme</span>
-                <ModeToggle />
-              </div>
-
               {onRefresh && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Refresh Data</span>
@@ -180,13 +174,10 @@ export function MobileNav() {
               )}
 
               {onAutoRefreshToggle && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Auto Refresh</span>
-                  <AutoRefreshToggle
-                    isEnabled={isAutoRefreshEnabled || false}
-                    onToggle={onAutoRefreshToggle}
-                  />
-                </div>
+                <AutoRefreshToggle
+                  isEnabled={isAutoRefreshEnabled || false}
+                  onToggle={onAutoRefreshToggle}
+                />
               )}
 
               <CompactRateLimit />

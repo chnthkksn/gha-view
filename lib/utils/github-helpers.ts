@@ -62,31 +62,41 @@ export function getStatusColor(
   conclusion: string | null
 ): string {
   if (status === "queued") {
-    return "bg-gray-500";
+    return "bg-muted-foreground";
   }
 
   if (status === "in_progress") {
-    return "bg-blue-500";
+    return "bg-warning";
   }
 
   if (status === "completed") {
     switch (conclusion) {
       case "success":
-        return "bg-green-500";
+        return "bg-primary";
       case "failure":
-        return "bg-red-500";
+        return "bg-destructive";
       case "cancelled":
-        return "bg-gray-500";
+        return "bg-muted-foreground";
       case "skipped":
-        return "bg-gray-400";
+        return "bg-muted-foreground";
       case "timed_out":
-        return "bg-orange-500";
+        return "bg-warning";
       default:
-        return "bg-gray-500";
+        return "bg-muted-foreground";
     }
   }
 
-  return "bg-gray-500";
+  return "bg-muted-foreground";
+}
+
+/**
+ * Get status text color for workflow runs (pairs with getStatusColor)
+ */
+export function getStatusTextColor(
+  status: string,
+  conclusion: string | null
+): string {
+  return getStatusColor(status, conclusion).replace("bg-", "text-");
 }
 
 /**

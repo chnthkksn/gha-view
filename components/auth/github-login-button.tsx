@@ -25,11 +25,10 @@ export function GitHubLoginButton() {
     <Button
       onClick={handleSignIn}
       disabled={isLoading}
-      size="lg"
-      className="gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+      className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-[13px] h-auto py-3"
     >
-      <Github className="h-5 w-5" />
-      {isLoading ? "Connecting..." : "Sign in with GitHub"}
+      <Github className="h-4 w-4" />
+      {isLoading ? "Connecting..." : "Continue with GitHub"}
     </Button>
   );
 }

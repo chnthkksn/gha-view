@@ -8,6 +8,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function CompactRateLimit() {
   const { data } = useRateLimit();
@@ -19,19 +20,16 @@ export function CompactRateLimit() {
   const isExhausted = core.remaining === 0;
   const resetDate = new Date(core.reset * 1000);
 
-  let colorClass =
-    "bg-green-100/50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
+  let tone: "primary" | "warning" | "destructive" = "primary";
   let Icon = CheckCircle2;
 
   if (percentageUsed > 75) {
-    colorClass =
-      "bg-yellow-100/50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800";
+    tone = "warning";
     Icon = AlertCircle;
   }
 
   if (percentageUsed > 90 || isExhausted) {
-    colorClass =
-      "bg-red-100/50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
+    tone = "destructive";
     Icon = AlertCircle;
   }
 
@@ -39,10 +37,15 @@ export function CompactRateLimit() {
     <HoverCard>
       <HoverCardTrigger asChild>
         <div
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-help ${colorClass}`}
+          className={cn(
+            "flex items-center gap-1.5 text-xs cursor-help",
+            tone === "primary" && "text-primary",
+            tone === "warning" && "text-warning",
+            tone === "destructive" && "text-destructive"
+          )}
         >
           <Icon className="h-3.5 w-3.5" />
-          <span>Rate limit: {percentageUsed.toFixed(0)}%</span>
+          <span>api {percentageUsed.toFixed(0)}%</span>
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-80" align="end">
@@ -50,11 +53,12 @@ export function CompactRateLimit() {
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold">API Rate Limit</h4>
             <span
-              className={`text-xs font-mono px-2 py-0.5 rounded-full ${
+              className={cn(
+                "text-xs font-mono px-2 py-0.5 rounded-full",
                 isExhausted
-                  ? "bg-red-100 text-red-700 dark:bg-red-900/30"
+                  ? "bg-destructive/15 text-destructive"
                   : "bg-muted"
-              }`}
+              )}
             >
               {core.remaining} / {core.limit}
             </span>
@@ -67,13 +71,12 @@ export function CompactRateLimit() {
             </div>
             <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all duration-500 rounded-full ${
-                  isExhausted
-                    ? "bg-red-500"
-                    : percentageUsed > 75
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
+                className={cn(
+                  "h-full transition-all duration-500 rounded-full",
+                  tone === "primary" && "bg-primary",
+                  tone === "warning" && "bg-warning",
+                  tone === "destructive" && "bg-destructive"
+                )}
                 style={{ width: `${percentageUsed}%` }}
               />
             </div>

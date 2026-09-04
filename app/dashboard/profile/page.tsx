@@ -2,20 +2,13 @@
 
 import { useSession, updateUser } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Calendar, Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
   const { data: session, refetch } = useSession();
@@ -32,6 +25,12 @@ export default function ProfilePage() {
   }
 
   const { user } = session;
+  const initials = (user.name || "U")
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,10 +47,10 @@ export default function ProfilePage() {
         image,
       });
       await refetch();
-      setMessage({ type: "success", text: "Profile updated successfully!" });
+      setMessage({ type: "success", text: "profile updated successfully" });
       setIsEditing(false);
       router.refresh();
-    } catch (error) {
+    } catch {
       setMessage({
         type: "error",
         text: "Failed to update profile. Please try again.",
@@ -62,178 +61,161 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 pb-20 md:pb-8">
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="max-w-[760px] mx-auto px-5 py-7 pb-20 md:pb-14">
+      <button
         onClick={() => router.push("/dashboard")}
-        className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs mb-5 cursor-pointer transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Dashboard
-      </Button>
+        <ArrowLeft className="h-3.5 w-3.5" />
+        back to dashboard
+      </button>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Profile
+          <h1 className="text-[22px] font-bold tracking-tight mb-1">
+            profile
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Manage your account settings and preferences.
+          <p className="text-muted-foreground/70 text-xs">
+            manage your account settings and preferences
           </p>
         </div>
         <Button
           onClick={() => setIsEditing(!isEditing)}
-          variant={isEditing ? "ghost" : "default"}
-          className="w-full sm:w-auto"
+          variant={isEditing ? "outline" : "default"}
+          className={cn(
+            "text-xs font-semibold h-auto py-2 px-3.5",
+            !isEditing && "bg-primary text-primary-foreground hover:bg-primary/90"
+          )}
         >
-          {isEditing ? "Cancel" : "Edit Profile"}
+          {isEditing ? "cancel" : "edit profile"}
         </Button>
       </div>
 
-      <div className="grid gap-6">
-        {/* User Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-            <CardDescription>
-              Your public profile details{" "}
-              {isEditing ? "(Editing Mode)" : "from GitHub"}.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isEditing ? (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Display Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    defaultValue={user.name || ""}
-                    placeholder="Your Display Name"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    This is how you will appear in the dashboard.
-                  </p>
-                </div>
+      <div className="bg-card border border-border rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <div className="text-[13px] font-semibold">Personal information</div>
+          <div className="text-muted-foreground/70 text-[11.5px] mt-0.5">
+            {isEditing ? "editing mode" : "your public profile details from GitHub"}
+          </div>
+        </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="image">Avatar URL</Label>
-                  <Input
-                    id="image"
-                    name="image"
-                    defaultValue={user.image || ""}
-                    placeholder="https://github.com/..."
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Link to your profile picture (defaults to GitHub avatar).
-                  </p>
-                </div>
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="name"
+                className="text-[11px] text-muted-foreground uppercase tracking-wider"
+              >
+                display name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                defaultValue={user.name || ""}
+                placeholder="Your Display Name"
+                required
+                className="bg-background border-white/[0.12] text-[13px]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="image"
+                className="text-[11px] text-muted-foreground uppercase tracking-wider"
+              >
+                avatar url
+              </Label>
+              <Input
+                id="image"
+                name="image"
+                defaultValue={user.image || ""}
+                placeholder="https://github.com/..."
+                className="bg-background border-white/[0.12] text-[13px]"
+              />
+            </div>
 
-                {message && (
-                  <div
-                    className={`p-3 rounded-md text-sm ${
-                      message.type === "success"
-                        ? "bg-green-50 text-green-600 dark:bg-green-900/20"
-                        : "bg-red-50 text-red-600 dark:bg-red-900/20"
-                    }`}
-                  >
-                    {message.text}
-                  </div>
+            {message && (
+              <div
+                className={cn(
+                  "p-2.5 rounded-md text-xs",
+                  message.type === "success"
+                    ? "bg-primary/10 text-primary"
+                    : "bg-destructive/10 text-destructive"
                 )}
-
-                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditing(false)}
-                    disabled={isLoading}
-                    className="w-full sm:w-auto"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full sm:w-auto"
-                  >
-                    {isLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Save Changes
-                  </Button>
-                </div>
-              </form>
-            ) : (
-              <div className="space-y-6">
-                {message && (
-                  <div className="p-3 mb-4 rounded-md text-sm bg-green-50 text-green-600 dark:bg-green-900/20 flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-600"></div>
-                    {message.text}
-                  </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-                  <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
-                    <AvatarImage src={user.image || undefined} />
-                    <AvatarFallback className="text-xl sm:text-2xl">
-                      {user.name?.[0] || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1 text-center sm:text-left">
-                    <h3 className="text-xl sm:text-2xl font-bold">
-                      {user.name}
-                    </h3>
-                    <p className="text-sm sm:text-base text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid gap-3 sm:gap-4">
-                  <div className="p-3 sm:p-4 rounded-lg border bg-card">
-                    <div className="flex items-center gap-3 text-muted-foreground mb-1.5">
-                      <User className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wider">
-                        Display Name
-                      </span>
-                    </div>
-                    <div className="font-medium text-sm sm:text-base">
-                      {user.name}
-                    </div>
-                  </div>
-
-                  <div className="p-3 sm:p-4 rounded-lg border bg-card">
-                    <div className="flex items-center gap-3 text-muted-foreground mb-1.5">
-                      <Mail className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wider">
-                        Email Address
-                      </span>
-                    </div>
-                    <div className="font-medium text-sm sm:text-base break-all">
-                      {user.email}
-                    </div>
-                  </div>
-
-                  <div className="p-3 sm:p-4 rounded-lg border bg-card">
-                    <div className="flex items-center gap-3 text-muted-foreground mb-1.5">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-xs font-medium uppercase tracking-wider">
-                        Member Since
-                      </span>
-                    </div>
-                    <div className="font-medium text-sm sm:text-base">
-                      {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString()
-                        : new Date().toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
+              >
+                {message.text}
               </div>
             )}
-          </CardContent>
-        </Card>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+                disabled={isLoading}
+                className="text-xs font-medium h-auto py-2 px-4 border-white/[0.14]"
+              >
+                cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="text-xs font-bold h-auto py-2 px-4 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                {isLoading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                save changes
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="p-5">
+            {message && (
+              <div className="flex items-center gap-2 bg-primary/10 border border-primary/25 text-primary rounded-md px-3 py-2 text-xs mb-4.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                {message.text}
+              </div>
+            )}
+            <div className="flex items-center gap-4 mb-5">
+              <Avatar className="h-16 w-16 border border-white/[0.12]">
+                <AvatarImage src={user.image || undefined} />
+                <AvatarFallback className="bg-[#1B1F26] text-muted-foreground text-lg font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="text-lg font-bold">{user.name}</div>
+                <div className="text-muted-foreground text-[13px]">
+                  {user.email}
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-2.5">
+              <div className="bg-[#0F1216] border border-white/[0.06] rounded-lg px-3.5 py-3">
+                <div className="text-muted-foreground/70 text-[10px] uppercase tracking-wider mb-1">
+                  display name
+                </div>
+                <div className="text-[13px] font-medium">{user.name}</div>
+              </div>
+              <div className="bg-[#0F1216] border border-white/[0.06] rounded-lg px-3.5 py-3">
+                <div className="text-muted-foreground/70 text-[10px] uppercase tracking-wider mb-1">
+                  email address
+                </div>
+                <div className="text-[13px] font-medium break-all">
+                  {user.email}
+                </div>
+              </div>
+              <div className="bg-[#0F1216] border border-white/[0.06] rounded-lg px-3.5 py-3">
+                <div className="text-muted-foreground/70 text-[10px] uppercase tracking-wider mb-1">
+                  member since
+                </div>
+                <div className="text-[13px] font-medium">
+                  {user.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString()
+                    : new Date().toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

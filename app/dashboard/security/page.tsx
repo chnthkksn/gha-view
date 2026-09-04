@@ -7,27 +7,16 @@ import {
   passkey,
   deleteUser,
 } from "@/lib/auth-client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
-  Shield,
   Github,
   Key,
-  Smartphone,
   Laptop,
+  Smartphone,
   LogOut,
   Trash2,
   Plus,
   Loader2,
-  AlertTriangle,
-  Globe,
   ArrowLeft,
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -49,6 +38,21 @@ interface PasskeyData {
   id: string;
   name?: string | null;
   createdAt: Date;
+}
+
+function getSessionTitle(uaString: string) {
+  const parser = new UAParser(uaString);
+  const browser = parser.getBrowser();
+  const os = parser.getOS();
+  return `${browser.name || "Unknown Browser"} on ${os.name || "Unknown OS"}`;
+}
+
+function getDeviceIcon(uaString: string) {
+  const device = new UAParser(uaString).getDevice();
+  if (device.type === "mobile" || device.type === "tablet") {
+    return <Smartphone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />;
+  }
+  return <Laptop className="h-3.5 w-3.5 text-muted-foreground shrink-0" />;
 }
 
 export default function SecurityPage() {
@@ -122,280 +126,187 @@ export default function SecurityPage() {
       toast.error("Failed to delete passkey");
     }
   };
-  const getDeviceIcon = (uaString: string) => {
-    const parser = new UAParser(uaString);
-    const device = parser.getDevice();
-
-    if (device.type === "mobile") return <Smartphone className="h-5 w-5" />;
-    if (device.type === "tablet") return <Smartphone className="h-5 w-5" />; // Tablet icon vs smartphone
-    return <Laptop className="h-5 w-5" />;
-  };
-
-  const getSessionInfo = (uaString: string) => {
-    const parser = new UAParser(uaString);
-    const browser = parser.getBrowser();
-    const os = parser.getOS();
-    const device = parser.getDevice();
-
-    const browserName = browser.name || "Unknown Browser";
-    const osName = os.name || "Unknown OS";
-
-    return {
-      title: `${browserName} on ${osName}`,
-      subtitle: device.model
-        ? `${device.vendor || ""} ${device.model}`
-        : "Desktop",
-    };
-  };
 
   if (!session?.user) return null;
 
   return (
-    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 pb-20 md:pb-8">
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="max-w-[800px] mx-auto px-5 py-7 pb-20 md:pb-14">
+      <button
         onClick={() => router.push("/dashboard")}
-        className="gap-2 -ml-2 mb-2 sm:mb-4 text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-xs mb-5 cursor-pointer transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Dashboard
-      </Button>
+        <ArrowLeft className="h-3.5 w-3.5" />
+        back to dashboard
+      </button>
 
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          Security
+      <div className="mb-6">
+        <h1 className="text-[22px] font-bold tracking-tight mb-1">
+          security
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Manage your account security, sessions, and authentication methods.
+        <p className="text-muted-foreground/70 text-xs">
+          manage your account security, sessions, and authentication methods
         </p>
       </div>
 
-      <div className="grid gap-4 sm:gap-6">
-        {/* Connected Accounts & Passkeys */}
-        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-600" />
-                <CardTitle>Authentication</CardTitle>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-3.5">
+        {/* Authentication */}
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="text-[13px] font-semibold mb-3">authentication</div>
+          <div className="flex items-center justify-between bg-[#0F1216] border border-white/[0.06] rounded-lg px-3 py-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-[22px] h-[22px] rounded-[5px] bg-[#1B1F26] flex items-center justify-center shrink-0">
+                <Github className="h-3 w-3" />
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-                <div className="flex items-center gap-3">
-                  <Github className="h-5 w-5" />
-                  <div>
-                    <div className="font-medium">GitHub</div>
-                    <div className="text-xs text-muted-foreground">
-                      Connected
-                    </div>
-                  </div>
+              <div>
+                <div className="text-[12.5px] font-semibold">GitHub</div>
+                <div className="text-[10.5px] text-muted-foreground/70">
+                  connected
                 </div>
-                <Badge
-                  variant="outline"
-                  className="border-green-200 text-green-700 bg-green-50"
-                >
-                  Verified
-                </Badge>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-orange-600" />
-                <CardTitle>Passkeys</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isLoadingPasskeys ? (
-                <div className="flex justify-center p-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <>
-                  {passkeys.map((pk) => (
-                    <div
-                      key={pk.id}
-                      className="flex items-center justify-between p-2.5 sm:p-3 rounded-lg border bg-card"
-                    >
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                        <Key className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
-                        <div className="font-medium text-sm truncate">
-                          {pk.name || "WebAuthn Key"}
-                        </div>
-                      </div>
-                      <ConfirmationDialog
-                        trigger={
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 shrink-0"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        }
-                        title="Delete Passkey?"
-                        description="You will no longer be able to sign in with this passkey."
-                        confirmLabel="Delete"
-                        variant="destructive"
-                        onConfirm={() => handleDeletePasskey(pk.id)}
-                      />
-                    </div>
-                  ))}
-                  {passkeys.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      No passkeys added.
-                    </p>
-                  )}
-                </>
-              )}
-              <Button
-                onClick={() => setIsAddPasskeyOpen(true)}
-                variant="outline"
-                className="w-full gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Add New Passkey
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+            <span className="text-[10px] text-primary border border-primary/30 rounded px-1.5 py-0.5">
+              verified
+            </span>
+          </div>
         </div>
 
-        {/* Sessions */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Laptop className="h-5 w-5 text-purple-600" />
-              <CardTitle>Active Sessions</CardTitle>
-            </div>
-            <CardDescription>
-              Manage devices where you are currently logged in.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {isLoadingSessions ? (
-                <div className="flex justify-center p-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                sessions.map((s) => {
-                  const info = getSessionInfo(s.userAgent || "");
-                  return (
-                    <div
-                      key={s.id}
-                      className="flex flex-col gap-3 p-3 sm:p-4 rounded-lg border bg-card"
-                    >
-                      <div className="flex items-start gap-3 sm:gap-4">
-                        <div className="p-2 bg-muted rounded-full shrink-0">
-                          {getDeviceIcon(s.userAgent || "")}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="text-sm sm:text-base font-medium">
-                              {info.title}
-                            </span>
-                            {s.id === session.session.id && (
-                              <Badge className="bg-green-600 hover:bg-green-700 text-xs">
-                                Current
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="text-xs text-muted-foreground space-y-1">
-                            <div className="flex items-center gap-1.5">
-                              <Globe className="h-3 w-3 shrink-0" />
-                              <span className="truncate">
-                                {s.ipAddress || "Unknown IP"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="hidden sm:inline">
-                                {info.subtitle}
-                              </span>
-                              {info.subtitle && (
-                                <span className="hidden sm:inline">•</span>
-                              )}
-                              <span>
-                                Expires:{" "}
-                                {new Date(s.expiresAt).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {s.id !== session.session.id && (
-                        <ConfirmationDialog
-                          trigger={
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-red-500 w-full sm:w-auto justify-center"
-                            >
-                              <LogOut className="h-4 w-4 mr-2" />
-                              Revoke Session
-                            </Button>
-                          }
-                          title="Revoke Session?"
-                          description="The selected device will be logged out immediately."
-                          confirmLabel="Revoke"
-                          variant="destructive"
-                          onConfirm={() => handleRevokeSession(s.token)}
-                        />
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Danger Zone */}
-        <Card className="border-red-200 dark:border-red-900/50">
-          <CardHeader>
-            <div className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
-              <CardTitle className="text-base sm:text-lg">
-                Danger Zone
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/50 gap-3 sm:gap-4">
-              <div className="space-y-1">
-                <div className="font-medium text-sm sm:text-base text-red-900 dark:text-red-200">
-                  Delete Account
-                </div>
-                <div className="text-xs sm:text-sm text-red-700 dark:text-red-300">
-                  Permanently remove your account and all data.
-                </div>
+        {/* Passkeys */}
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="text-[13px] font-semibold mb-3">passkeys</div>
+          <div className="flex flex-col gap-2 mb-2.5">
+            {isLoadingPasskeys ? (
+              <div className="flex justify-center py-3">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
-              <ConfirmationDialog
-                trigger={
-                  <Button
+            ) : passkeys.length === 0 ? (
+              <div className="text-muted-foreground/70 text-[11.5px]">
+                no passkeys added
+              </div>
+            ) : (
+              passkeys.map((pk) => (
+                <div
+                  key={pk.id}
+                  className="flex items-center gap-2 bg-[#0F1216] border border-white/[0.06] rounded-lg px-3 py-2.5"
+                >
+                  <Key className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <span className="text-xs flex-1 truncate">
+                    {pk.name || "WebAuthn Key"}
+                  </span>
+                  <ConfirmationDialog
+                    trigger={
+                      <button className="text-destructive text-xs cursor-pointer shrink-0">
+                        delete
+                      </button>
+                    }
+                    title="Delete Passkey?"
+                    description="You will no longer be able to sign in with this passkey."
+                    confirmLabel="Delete"
                     variant="destructive"
-                    size="sm"
-                    className="w-full sm:w-auto"
-                  >
-                    Delete Account
-                  </Button>
-                }
-                title="Delete Your Account?"
-                description="This action is permanent and cannot be undone. All your data will be wiped immediately."
-                confirmLabel="Delete Account"
-                variant="destructive"
-                onConfirm={async () => {
-                  await deleteUser();
-                  router.push("/");
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
+                    onConfirm={() => handleDeletePasskey(pk.id)}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+          <Button
+            onClick={() => setIsAddPasskeyOpen(true)}
+            variant="outline"
+            className="w-full text-xs font-medium h-auto py-2 border-white/[0.14] gap-1.5"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            add new passkey
+          </Button>
+        </div>
       </div>
+
+      {/* Active sessions */}
+      <div className="bg-card border border-border rounded-lg p-4 mb-3.5">
+        <div className="text-[13px] font-semibold mb-3">active sessions</div>
+        <div className="flex flex-col gap-2">
+          {isLoadingSessions ? (
+            <div className="flex justify-center py-3">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            sessions.map((s) => {
+              const isCurrent = s.id === session.session.id;
+              return (
+                <div
+                  key={s.id}
+                  className="bg-[#0F1216] border border-white/[0.06] rounded-lg p-3"
+                >
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[12.5px] font-semibold flex items-center gap-1.5">
+                          {getDeviceIcon(s.userAgent || "")}
+                          {getSessionTitle(s.userAgent || "")}
+                        </span>
+                        {isCurrent && (
+                          <span className="text-[9.5px] bg-primary/15 text-primary rounded px-1.5 py-px">
+                            current
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-muted-foreground/70 text-[11px] mt-0.5">
+                        {s.ipAddress || "Unknown IP"} &middot; expires{" "}
+                        {new Date(s.expiresAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    {!isCurrent && (
+                      <ConfirmationDialog
+                        trigger={
+                          <button className="text-destructive text-[11.5px] cursor-pointer whitespace-nowrap flex items-center gap-1 shrink-0">
+                            <LogOut className="h-3 w-3" />
+                            revoke
+                          </button>
+                        }
+                        title="Revoke Session?"
+                        description="The selected device will be logged out immediately."
+                        confirmLabel="Revoke"
+                        variant="destructive"
+                        onConfirm={() => handleRevokeSession(s.token)}
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Danger zone */}
+      <div className="bg-card border border-destructive/25 rounded-lg p-4">
+        <div className="text-[13px] font-semibold text-destructive mb-3">
+          danger zone
+        </div>
+        <div className="flex items-center justify-between gap-3 flex-wrap bg-destructive/[0.06] border border-destructive/20 rounded-lg px-3.5 py-3">
+          <div>
+            <div className="text-[12.5px] font-semibold">delete account</div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">
+              permanently remove your account and all data
+            </div>
+          </div>
+          <ConfirmationDialog
+            trigger={
+              <Button className="bg-destructive text-white hover:bg-destructive/90 text-xs font-bold h-auto py-2 px-3.5">
+                <Trash2 className="h-3.5 w-3.5" />
+                delete account
+              </Button>
+            }
+            title="Delete Your Account?"
+            description="This action is permanent and cannot be undone. All your data will be wiped immediately."
+            confirmLabel="Delete Account"
+            variant="destructive"
+            onConfirm={async () => {
+              await deleteUser();
+              router.push("/");
+            }}
+          />
+        </div>
+      </div>
+
       <AddPasskeyDialog
         open={isAddPasskeyOpen}
         onOpenChange={setIsAddPasskeyOpen}

@@ -1,11 +1,10 @@
 "use client";
 
-import { useRateLimit, type RateLimitData } from "@/hooks/use-rate-limit";
+import { useRateLimit } from "@/hooks/use-rate-limit";
 import { AlertCircle, Clock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
-// CountdownTimer component remains the same... (omitting here, will use specific targeting)
 function CountdownTimer({ targetDate }: { targetDate: Date }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
 
@@ -57,33 +56,34 @@ export function RateLimitIndicator() {
     return null;
   }
 
+  const tone = isExhausted ? "destructive" : "warning";
+
   return (
     <div
-      className={`w-full mb-6 rounded-xl border shadow-sm overflow-hidden flex flex-col md:flex-row ${
-        isExhausted
-          ? "bg-red-50/40 border-red-100 dark:bg-red-950/10 dark:border-red-900/30"
-          : "bg-yellow-50/40 border-yellow-100 dark:bg-yellow-950/10 dark:border-yellow-900/30"
-      }`}
+      className={cn(
+        "w-full mb-6 rounded-lg border overflow-hidden flex flex-col md:flex-row bg-card",
+        tone === "destructive" ? "border-destructive/25" : "border-warning/25"
+      )}
     >
       {/* Left Main Content */}
       <div className="flex-1 p-4 md:p-5 flex items-start gap-4">
         <div
-          className={`p-2.5 rounded-full shrink-0 ${
-            isExhausted
-              ? "bg-red-100 text-red-600 dark:bg-red-900/40"
-              : "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/40"
-          }`}
+          className={cn(
+            "p-2.5 rounded-full shrink-0",
+            tone === "destructive"
+              ? "bg-destructive/10 text-destructive"
+              : "bg-warning/10 text-warning"
+          )}
         >
           <AlertCircle className="h-6 w-6" />
         </div>
 
         <div>
           <h3
-            className={`text-lg font-bold ${
-              isExhausted
-                ? "text-red-900 dark:text-red-100"
-                : "text-yellow-900 dark:text-yellow-100"
-            }`}
+            className={cn(
+              "text-base font-bold",
+              tone === "destructive" ? "text-destructive" : "text-warning"
+            )}
           >
             {isExhausted ? "API Rate Limit Exhausted" : "Low API Rate Limit"}
           </h3>
@@ -95,30 +95,30 @@ export function RateLimitIndicator() {
         </div>
       </div>
 
-      {/* Right Stats Panel - styled as a distinct "sidebar" on desktop */}
+      {/* Right Stats Panel */}
       <div
-        className={`p-4 md:p-5 md:w-72 md:border-l flex flex-col justify-center gap-4 ${
-          isExhausted
-            ? "bg-red-100/30 border-red-100 dark:bg-red-950/20 dark:border-red-900/30"
-            : "bg-yellow-100/30 border-yellow-100 dark:bg-yellow-950/20 dark:border-yellow-900/30"
-        }`}
+        className={cn(
+          "p-4 md:p-5 md:w-72 md:border-l border-t md:border-t-0 flex flex-col justify-center gap-4 bg-[#0F1216]",
+          tone === "destructive" ? "border-destructive/20" : "border-warning/20"
+        )}
       >
         {/* Key Metrics Row */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
               Used
             </p>
             <p
-              className={`text-2xl font-black ${
-                isExhausted ? "text-red-600" : "text-yellow-600"
-              }`}
+              className={cn(
+                "text-2xl font-bold",
+                tone === "destructive" ? "text-destructive" : "text-warning"
+              )}
             >
               {percentageUsed.toFixed(0)}%
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
               Remaining
             </p>
             <p className="text-2xl font-bold text-foreground">
@@ -127,25 +127,25 @@ export function RateLimitIndicator() {
           </div>
         </div>
 
-        {/* Improved Progress Bar */}
-        <div className="h-2.5 w-full bg-background/80 rounded-full overflow-hidden shadow-inner ring-1 ring-black/5 dark:ring-white/5">
+        {/* Progress Bar */}
+        <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
           <div
-            className={`h-full transition-all duration-700 rounded-full ${
-              isExhausted
-                ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                : "bg-yellow-500"
-            }`}
+            className={cn(
+              "h-full transition-all duration-700 rounded-full",
+              tone === "destructive" ? "bg-destructive" : "bg-warning"
+            )}
             style={{ width: `${percentageUsed}%` }}
           />
         </div>
 
-        {/* Reset Timer Badge */}
+        {/* Reset Timer */}
         <div
-          className={`flex items-center justify-center gap-2 p-2 rounded-lg text-sm font-medium ${
-            isExhausted
-              ? "bg-red-200/50 text-red-800 dark:bg-red-900/40 dark:text-red-200"
-              : "bg-yellow-200/50 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200"
-          }`}
+          className={cn(
+            "flex items-center justify-center gap-2 p-2 rounded-md text-sm font-medium border",
+            tone === "destructive"
+              ? "bg-destructive/10 text-destructive border-destructive/20"
+              : "bg-warning/10 text-warning border-warning/20"
+          )}
         >
           <Clock className="h-4 w-4" />
           <div className="flex flex-col items-center leading-none gap-0.5">

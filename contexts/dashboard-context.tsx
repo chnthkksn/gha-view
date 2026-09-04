@@ -7,6 +7,7 @@ interface DashboardContextValue {
   isRefreshing?: boolean;
   isAutoRefreshEnabled?: boolean;
   onAutoRefreshToggle?: (enabled: boolean) => void;
+  lastUpdated?: number;
 }
 
 interface DashboardContextType {

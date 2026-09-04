@@ -9,7 +9,6 @@ import { RepoList } from "@/components/dashboard/repo-list";
 import type { GitHubRepository, GitHubWorkflowRun } from "@/types/github";
 import { WorkflowRuns } from "@/components/dashboard/workflow-runs";
 import { RateLimitIndicator } from "@/components/dashboard/rate-limit-indicator";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { MobileStatusBar } from "@/components/dashboard/mobile-status-bar";
 import { useRepositories } from "@/hooks/use-github-data";
 import { calculateWorkflowStats } from "@/lib/utils/github-helpers";
@@ -22,6 +21,7 @@ export default function DashboardPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState(false);
+  const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
   const setDashboard = useSetDashboard();
 
   const {
@@ -56,6 +56,16 @@ export default function DashboardPage() {
   const isRefreshing = reposRefetching || runsRefetching;
   const lastUpdated = Math.max(reposUpdatedAt || 0, runsUpdatedAt || 0);
 
+  const visibleRuns = selectedRepo
+    ? workflowRuns.filter(
+        (run: GitHubWorkflowRun) => run.repository.full_name === selectedRepo
+      )
+    : workflowRuns;
+
+  const handleRepoClick = (fullName: string) => {
+    setSelectedRepo((current) => (current === fullName ? null : fullName));
+  };
+
   const handleRefresh = async () => {
     await Promise.all([refetchRepos()]); // Only need to refetch repos now
   };
@@ -69,12 +79,14 @@ export default function DashboardPage() {
       isRefreshing,
       isAutoRefreshEnabled,
       onAutoRefreshToggle: setIsAutoRefreshEnabled,
+      lastUpdated,
     });
   }, [
     isRefreshing,
     isAutoRefreshEnabled,
     refetchRepos,
     setDashboard,
+    lastUpdated,
   ]);
 
   useEffect(() => {
@@ -128,18 +140,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/30 dark:bg-none dark:bg-background">
-      {/* Desktop Header */}
-      <DashboardHeader
-        lastUpdated={lastUpdated}
-        isRefreshing={isRefreshing}
-        isAutoRefreshEnabled={isAutoRefreshEnabled}
-        onRefresh={() => {
-          refetchRepos();
-        }}
-        onAutoRefreshToggle={setIsAutoRefreshEnabled}
-      />
-
+    <div className="min-h-screen bg-background">
       {/* Mobile Status Bar */}
       <MobileStatusBar lastUpdated={lastUpdated} isRefreshing={isRefreshing} />
 
@@ -163,12 +164,17 @@ export default function DashboardPage() {
           />
           {/* Grid layout for repos and workflows */}
           <div
-            className="grid gap-4 sm:gap-6 lg:grid-cols-[450px_1fr]"
+            className="grid gap-4 sm:gap-6 lg:grid-cols-[300px_1fr] lg:h-[600px]"
             data-workflow-section
           >
-            <RepoList repositories={repositories} isLoading={reposLoading} />
+            <RepoList
+              repositories={repositories}
+              isLoading={reposLoading}
+              selectedRepo={selectedRepo}
+              onRepoClick={handleRepoClick}
+            />
             {/* Desktop version - hidden on mobile */}
-            <WorkflowRuns runs={workflowRuns} isLoading={runsLoading} />
+            <WorkflowRuns runs={visibleRuns} isLoading={runsLoading} />
           </div>
           {/* Footer */}
           <div className="mt-6 sm:mt-8 text-center pb-6 sm:pb-8 border-t pt-6 sm:pt-8 border-border/40">
