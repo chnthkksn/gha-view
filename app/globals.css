@@ -92,3 +92,14 @@
     font-family: var(--font-sans);
   }
 }
+
+/*
+ * Radix ScrollArea's Viewport wraps its children in a div with an inline
+ * style of `display: table`, sized to the widest child's max-content width.
+ * That defeats flex-1/truncate shrinking inside the viewport and causes
+ * horizontal overflow clipped by ancestor overflow-hidden. Force it back to
+ * a normal block so content respects the viewport's actual width.
+ */
+[data-radix-scroll-area-viewport] > div {
+  display: block !important;
+}

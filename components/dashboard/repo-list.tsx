@@ -1,7 +1,14 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ExternalLink, GitBranch, Star, Lock, User, Building } from "lucide-react";
+import {
+  ExternalLink,
+  GitBranch,
+  Star,
+  Lock,
+  User,
+  Building,
+} from "lucide-react";
 import type { GitHubRepository } from "@/types/github";
 import {
   formatRelativeTime,
@@ -44,7 +51,10 @@ export function RepoList({
           </div>
           <div className="p-3 space-y-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-8 w-full bg-muted rounded animate-pulse" />
+              <div
+                key={i}
+                className="h-8 w-full bg-muted rounded animate-pulse"
+              />
             ))}
           </div>
         </div>
@@ -125,7 +135,7 @@ export function RepoList({
                   "group px-3.5 py-2.5 border-b border-border/50 cursor-pointer transition-colors last:border-b-0",
                   selectedRepo === repo.full_name
                     ? "bg-white/[0.05]"
-                    : "hover:bg-white/[0.03]"
+                    : "hover:bg-white/[0.03]",
                 )}
               >
                 <div className="flex items-center gap-1.5">
@@ -139,7 +149,7 @@ export function RepoList({
                     <span
                       className={cn(
                         "text-[11px] font-semibold shrink-0",
-                        successColor(repo.stats.successRate || 0)
+                        successColor(repo.stats.successRate || 0),
                       )}
                     >
                       {repo.stats.successRate}%
@@ -271,7 +281,7 @@ export function RepoList({
                         <span
                           className={cn(
                             "font-medium",
-                            successColor(repo.stats.successRate || 0)
+                            successColor(repo.stats.successRate || 0),
                           )}
                         >
                           {repo.stats.successRate}%
@@ -282,18 +292,18 @@ export function RepoList({
                   </div>
                   {repo.stats && (
                     <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground px-4 pb-1 pt-2 border-t border-border/50 mt-2">
-                       <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1">
                         <span className="font-medium text-foreground">
                           {formatDurationCompact(repo.stats.minDuration || 0)}
                         </span>
                         min
                       </div>
                       <div className="flex items-center justify-center gap-1">
-                          <span className="font-medium text-foreground">
-                            {formatDurationCompact(repo.stats.avgDuration || 0)}
-                          </span>
-                          avg
-                        </div>
+                        <span className="font-medium text-foreground">
+                          {formatDurationCompact(repo.stats.avgDuration || 0)}
+                        </span>
+                        avg
+                      </div>
                       <div className="flex items-center justify-end gap-1">
                         <span className="font-medium text-foreground">
                           {formatDurationCompact(repo.stats.maxDuration || 0)}
